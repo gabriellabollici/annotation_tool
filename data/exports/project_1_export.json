@@ -1,0 +1,63 @@
+[
+    {
+        "id": "48da9d6a-e662-4cab-839c-55c4e4a26bea",
+        "annotator_name": "filip_wouter",
+        "labels": {
+            "social_identity": "liberals",
+            "view_point": "out_group",
+            "narrative_roles": [
+                "villain",
+                "loser"
+            ]
+        },
+        "date_time": "2026-05-08T10:32:18.715140"
+    },
+    {
+        "id": "8d9e3e4f-3cac-45b4-9ea2-d8ce1d5a46c3",
+        "annotator_name": "filip_wouter",
+        "labels": {
+            "social_identity": "republican",
+            "view_point": "out_group",
+            "narrative_roles": [
+                "villain"
+            ]
+        },
+        "date_time": "2026-05-08T10:34:33.516164"
+    },
+    {
+        "id": "8d9e3e4f-3cac-45b4-9ea2-d8ce1d5a46c3",
+        "annotator_name": "filip_wouter",
+        "labels": {
+            "social_identity": "racist",
+            "view_point": "",
+            "narrative_roles": [
+                "villain"
+            ]
+        },
+        "date_time": "2026-05-08T10:34:33.516297"
+    },
+    {
+        "id": "8d9e3e4f-3cac-45b4-9ea2-d8ce1d5a46c3",
+        "annotator_name": "filip_wouter",
+        "labels": {
+            "social_identity": "democrat",
+            "view_point": "in_group",
+            "narrative_roles": [
+                "sage"
+            ]
+        },
+        "date_time": "2026-05-08T10:34:33.516352"
+    },
+    {
+        "id": "be15fbb4-2326-43b9-aae5-a8bd32e2d2cf",
+        "annotator_name": "filip_wouter",
+        "labels": {
+            "social_identity": "skeptic electoral system",
+            "view_point": "in_group",
+            "narrative_roles": [
+                "sage"
+            ]
+        },
+        "date_time": "2026-05-08T10:33:11.642920"
+    }
+]

@@ -1,0 +1,339 @@
+{% extends "base.html" %}
+{% block title %}Annotate - {{ image.filename }}{% endblock %}
+{% block content %}
+<div class="space-y-8">
+    <div class="rounded-[1.75rem] bg-white/90 p-6 shadow-sm ring-1 ring-slate-200">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[#845EF7]">Annotate</p>
+                <h2 class="mt-3 text-3xl font-semibold text-slate-900">{{ image.filename }}</h2>
+            </div>
+            {% if annotate_all_mode %}
+            <div class="flex flex-wrap items-center gap-3">
+                {% if prev_index is not none %}
+                <a href="/projects/{{ project.id }}/images/annotate-all?index={{ prev_index }}" class="inline-flex items-center justify-center rounded-full border border-[#00C9A7] px-4 py-3 text-sm font-semibold text-[#00C9A7] transition hover:bg-[#00C9A7] hover:text-white">← Previous</a>
+                {% endif %}
+                <span class="rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700">{{ current_index + 1 }} of {{ total_images }}</span>
+                {% if next_index is not none %}
+                <a href="/projects/{{ project.id }}/images/annotate-all?index={{ next_index }}" class="inline-flex items-center justify-center rounded-full border border-[#00C9A7] px-4 py-3 text-sm font-semibold text-[#00C9A7] transition hover:bg-[#00C9A7] hover:text-white">Next →</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="grid gap-6 xl:grid-cols-[1.25fr_0.95fr]">
+        <div class="rounded-[1.75rem] bg-white/90 p-6 shadow-sm ring-1 ring-slate-200">
+            <img src="/static/uploads/{{ project.id }}/{{ image.filename }}" alt="{{ image.filename }}" class="w-full rounded-[1.5rem] border border-slate-200 object-cover">
+        </div>
+        <div class="rounded-[1.75rem] bg-white/90 p-6 shadow-sm ring-1 ring-slate-200">
+            <form method="post" action="/images/{{ image.id }}/annotate" id="annotation-form" onsubmit="renumberAnnotations(event)" class="space-y-6">
+                {% if annotate_all_mode %}
+                <input type="hidden" name="annotate_all" value="1">
+                <input type="hidden" name="project_id" value="{{ project.id }}">
+                <input type="hidden" name="current_index" value="{{ current_index }}">
+                {% endif %}
+
+                <div id="annotations-container" class="space-y-6">
+                    {% if user_annotations %}
+                        {% for ann in user_annotations %}
+                        {% set ann_index = loop.index0 %}
+                        <div class="annotation-item rounded-[1.25rem] border border-slate-200 bg-slate-50 p-5">
+                            <div class="flex items-start justify-between gap-4">
+                                <h3 class="text-lg font-semibold text-slate-900">Annotation {{ loop.index }}</h3>
+                                <button type="button" class="rounded-full border border-[#845EF7] px-3 py-2 text-sm font-semibold text-[#845EF7] transition hover:bg-[#845EF7] hover:text-white" onclick="deleteAnnotationSet(this)">Delete</button>
+                            </div>
+                            <div class="space-y-4">
+                                <fieldset class="space-y-3">
+                                    <legend class="text-sm font-semibold text-slate-700">Social Identity</legend>
+                                    <div class="space-y-2">
+                                        {% set social_identity_options = ['women', 'men', 'feminist', 'anti-feminist', 'misogynist/male supremacist', 'sex-worker', 'voter', 'abstentionist', 'republican', 'democrat', 'liberal', 'progressive', 'conservative', 'libertarian', 'authoritarian', 'green party supporter', 'politically disillusioned', 'climate change skeptic/denier', 'climate activist'] %}
+                                        {% set selected_identities = ann.social_identity.split(', ') if ann.social_identity else [] %}
+                                        {% set other_label = '' %}
+                                        {% for identity in selected_identities %}
+                                            {% if identity not in social_identity_options %}
+                                                {% set other_label = identity %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% for option in social_identity_options %}
+                                        <label class="flex items-center gap-2 text-sm text-slate-700">
+                                            <input type="checkbox" name="social_identity_{{ ann_index }}" value="{{ option }}" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]" {% if option in selected_identities %}checked{% endif %}>
+                                            {{ option | capitalize }}
+                                        </label>
+                                        {% endfor %}
+                                        <div class="mt-3 pt-3 border-t border-slate-300">
+                                            <label class="block text-xs font-semibold text-slate-600 mb-2">Other label:</label>
+                                            <input type="text" name="other_label_{{ ann_index }}" value="{{ other_label }}" placeholder="Add a label not listed above..." class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15">
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <fieldset class="space-y-3">
+                                    <legend class="text-sm font-semibold text-slate-700">View Point</legend>
+                                    <div class="flex flex-wrap gap-3">
+                                        <label class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 hover:border-[#00C9A7]">
+                                            <input type="radio" name="view_point_{{ ann_index }}" value="in_group" class="h-4 w-4 text-[#00C9A7]" {% if ann.view_point == 'in_group' %}checked{% endif %}>
+                                            In Group
+                                        </label>
+                                        <label class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 hover:border-[#00C9A7]">
+                                            <input type="radio" name="view_point_{{ ann_index }}" value="out_group" class="h-4 w-4 text-[#00C9A7]" {% if ann.view_point == 'out_group' %}checked{% endif %}>
+                                            Out Group
+                                        </label>
+                                    </div>
+                                </fieldset>
+                                <fieldset class="space-y-3">
+                                    <legend class="text-sm font-semibold text-slate-700">Narrative Roles</legend>
+                                    <div class="grid gap-4 md:grid-cols-3">
+                                        <div class="space-y-3 rounded-2xl border border-slate-200 bg-white p-4">
+                                            <p class="text-sm font-semibold leading-5 whitespace-normal break-words text-slate-700">Positive/<br>Superior</p>
+                                            {% for role in narrative_roles_options['positive_superior'] %}
+                                            <label class="flex items-center gap-2 text-sm text-slate-700">
+                                                <input type="checkbox" name="narrative_roles_{{ ann_index }}" value="{{ role }}" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]" {% if role in ann.parsed_roles %}checked{% endif %}>
+                                                {{ role | capitalize }}
+                                            </label>
+                                            {% endfor %}
+                                        </div>
+                                        <div class="space-y-3 rounded-2xl border border-slate-200 bg-white p-4">
+                                            <p class="text-sm font-semibold leading-5 whitespace-normal break-words text-slate-700">Negative/<br>Inferior</p>
+                                            {% for role in narrative_roles_options['negative_inferior'] %}
+                                            <label class="flex items-center gap-2 text-sm text-slate-700">
+                                                <input type="checkbox" name="narrative_roles_{{ ann_index }}" value="{{ role }}" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]" {% if role in ann.parsed_roles %}checked{% endif %}>
+                                                {{ role | capitalize }}
+                                            </label>
+                                            {% endfor %}
+                                        </div>
+                                        <div class="space-y-3 rounded-2xl border border-slate-200 bg-white p-4">
+                                            <p class="text-sm font-semibold leading-5 whitespace-normal break-words text-slate-700">Positive/<br>Inferior</p>
+                                            {% for role in narrative_roles_options['positive_inferior'] %}
+                                            <label class="flex items-center gap-2 text-sm text-slate-700">
+                                                <input type="checkbox" name="narrative_roles_{{ ann_index }}" value="{{ role }}" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]" {% if role in ann.parsed_roles %}checked{% endif %}>
+                                                {{ role | capitalize }}
+                                            </label>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <div class="flex items-center gap-3">
+                                    <label class="inline-flex items-center gap-2 text-sm text-slate-700">
+                                        <input type="checkbox" name="unclear_case_{{ ann_index }}" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]" {% if ann.unclear_case %}checked{% endif %}>
+                                        Flag unclear case
+                                    </label>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700">Comments</label>
+                                    <textarea name="comments" placeholder="Optional: add notes about nuances..." class="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15">{% if ann.comments %}{{ ann.comments }}{% endif %}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="annotation-item rounded-[1.25rem] border border-slate-200 bg-slate-50 p-5">
+                            <div class="flex items-start justify-between gap-4">
+                                <h3 class="text-lg font-semibold text-slate-900">Annotation 1</h3>
+                            </div>
+                            <div class="space-y-4">
+                                <fieldset class="space-y-3">
+                                    <legend class="text-sm font-semibold text-slate-700">Social Identity</legend>
+                                    <div class="space-y-2">
+                                        {% set social_identity_options = ['women', 'men', 'feminist', 'anti-feminist', 'misogynist/male supremacist', 'sex-worker', 'voter', 'abstentionist', 'republican', 'democrat', 'liberal', 'progressive', 'conservative', 'libertarian', 'authoritarian', 'green party supporter', 'politically disillusioned', 'climate change skeptic/denier', 'climate activist'] %}
+                                        {% set selected_identities = [] %}
+                                        {% set other_label = '' %}
+                                        {% for option in social_identity_options %}
+                                        <label class="flex items-center gap-2 text-sm text-slate-700">
+                                            <input type="checkbox" name="social_identity_0" value="{{ option }}" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]">
+                                            {{ option | capitalize }}
+                                        </label>
+                                        {% endfor %}
+                                        <div class="mt-3 pt-3 border-t border-slate-300">
+                                            <label class="block text-xs font-semibold text-slate-600 mb-2">Other label:</label>
+                                            <input type="text" name="other_label_0" value="{{ other_label }}" placeholder="Add a label not listed above..." class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15">
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <fieldset class="space-y-3">
+                                    <legend class="text-sm font-semibold text-slate-700">View Point</legend>
+                                    <div class="flex flex-wrap gap-3">
+                                        <label class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 hover:border-[#00C9A7]">
+                                            <input type="radio" name="view_point_0" value="in_group" class="h-4 w-4 text-[#00C9A7]">
+                                            In Group
+                                        </label>
+                                        <label class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 hover:border-[#00C9A7]">
+                                            <input type="radio" name="view_point_0" value="out_group" class="h-4 w-4 text-[#00C9A7]">
+                                            Out Group
+                                        </label>
+                                    </div>
+                                </fieldset>
+                                <fieldset class="space-y-3">
+                                    <legend class="text-sm font-semibold text-slate-700">Narrative Roles</legend>
+                                    <div class="grid gap-4 md:grid-cols-3">
+                                        <div class="space-y-3 rounded-2xl border border-slate-200 bg-white p-4">
+                                            <p class="text-sm font-semibold leading-5 whitespace-normal break-words text-slate-700">Positive/<br>Superior</p>
+                                            {% for role in narrative_roles_options['positive_superior'] %}
+                                            <label class="flex items-center gap-2 text-sm text-slate-700">
+                                                <input type="checkbox" name="narrative_roles_0" value="{{ role }}" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]">
+                                                {{ role | capitalize }}
+                                            </label>
+                                            {% endfor %}
+                                        </div>
+                                        <div class="space-y-3 rounded-2xl border border-slate-200 bg-white p-4">
+                                            <p class="text-sm font-semibold leading-5 whitespace-normal break-words text-slate-700">Negative/<br>Inferior</p>
+                                            {% for role in narrative_roles_options['negative_inferior'] %}
+                                            <label class="flex items-center gap-2 text-sm text-slate-700">
+                                                <input type="checkbox" name="narrative_roles_0" value="{{ role }}" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]">
+                                                {{ role | capitalize }}
+                                            </label>
+                                            {% endfor %}
+                                        </div>
+                                        <div class="space-y-3 rounded-2xl border border-slate-200 bg-white p-4">
+                                            <p class="text-sm font-semibold leading-5 whitespace-normal break-words text-slate-700">Positive/<br>Inferior</p>
+                                            {% for role in narrative_roles_options['positive_inferior'] %}
+                                            <label class="flex items-center gap-2 text-sm text-slate-700">
+                                                <input type="checkbox" name="narrative_roles_0" value="{{ role }}" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]">
+                                                {{ role | capitalize }}
+                                            </label>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <div class="flex items-center gap-3">
+                                    <label class="inline-flex items-center gap-2 text-sm text-slate-700">
+                                        <input type="checkbox" name="unclear_case_0" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]">
+                                        Flag unclear case
+                                    </label>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700">Comments</label>
+                                    <textarea name="comments" placeholder="Optional: add notes about nuances..." class="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    <button type="button" class="inline-flex items-center justify-center rounded-full border border-[#00C9A7] px-5 py-3 text-sm font-semibold text-[#00C9A7] transition hover:bg-[#00C9A7] hover:text-white" onclick="addAnnotation()">+ Add Annotation</button>
+                    <button type="submit" class="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#00C9A7] to-[#845EF7] px-5 py-3 text-sm font-semibold text-white shadow-sm">Save Annotations</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <a href="/projects/{{ project.id }}/images" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 transition hover:text-[#00C9A7]">← Back to Image Table</a>
+</div>
+
+<script>
+const socialIdentityOptions = ['women', 'men', 'feminist', 'anti-feminist', 'misogynist/male supremacist', 'sex-worker', 'voter', 'abstentionist', 'republican', 'democrat', 'liberal', 'progressive', 'conservative', 'libertarian', 'authoritarian', 'green party supporter', 'politically disillusioned', 'climate change skeptic/denier', 'climate activist'];
+
+function renumberAnnotations(event) {
+    const container = document.getElementById('annotations-container');
+    const items = container.querySelectorAll('.annotation-item');
+    
+    items.forEach((item, index) => {
+        const allCheckboxes = item.querySelectorAll('input[type="checkbox"]');
+        allCheckboxes.forEach(checkbox => {
+            const name = checkbox.getAttribute('name');
+            if (name && (name.startsWith('narrative_roles_') || name === 'narrative_roles_temp')) {
+                checkbox.setAttribute('name', `narrative_roles_${index}`);
+            } else if (name && (name.startsWith('social_identity_') || name === 'social_identity_temp')) {
+                checkbox.setAttribute('name', `social_identity_${index}`);
+            } else if (name && (name.startsWith('unclear_case_') || name === 'unclear_case_temp')) {
+                checkbox.setAttribute('name', `unclear_case_${index}`);
+            }
+        });
+        
+        const otherLabelInputs = item.querySelectorAll('input[type="text"][name^="other_label_"], input[type="text"][name="other_label_temp"]');
+        otherLabelInputs.forEach(input => {
+            input.setAttribute('name', `other_label_${index}`);
+        });
+        
+        const radios = item.querySelectorAll('input[type="radio"][name^="view_point_"], input[type="radio"][name="view_point_temp"]');
+        radios.forEach(radio => {
+            radio.setAttribute('name', `view_point_${index}`);
+        });
+        
+        item.querySelector('h3').textContent = `Annotation ${index + 1}`;
+    });
+    return true;
+}
+
+function addAnnotation() {
+    const container = document.getElementById('annotations-container');
+    const count = container.querySelectorAll('.annotation-item').length;
+    const newAnnotation = document.createElement('div');
+    newAnnotation.className = 'annotation-item rounded-[1.25rem] border border-slate-200 bg-slate-50 p-5';
+    
+    // Build social identity checkboxes
+    let socialIdentityHtml = '<div class="space-y-2">';
+    socialIdentityOptions.forEach(option => {
+        socialIdentityHtml += `<label class="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" name="social_identity_temp" value="${option}" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]">${option.charAt(0).toUpperCase() + option.slice(1)}</label>`;
+    });
+    socialIdentityHtml += '<div class="mt-3 pt-3 border-t border-slate-300"><label class="block text-xs font-semibold text-slate-600 mb-2">Other label:</label><input type="text" name="other_label_temp" placeholder="Add a label not listed above..." class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15"></div>';
+    socialIdentityHtml += '</div>';
+    
+    // Build narrative roles checkboxes
+    let rolesHtml = '<div class="grid gap-4 md:grid-cols-3">';
+    function roleColumn(title, roles) {
+        let content = `<div class="space-y-3 rounded-2xl border border-slate-200 bg-white p-4"><p class="text-sm font-semibold leading-5 whitespace-normal break-words text-slate-700">${title}</p>`;
+        roles.forEach(role => {
+            content += `<label class="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" name="narrative_roles_temp" value="${role}" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]">${role.charAt(0).toUpperCase() + role.slice(1)}</label>`;
+        });
+        return content + '</div>';
+    }
+    // Get narrative roles from the page
+    const existingRoles = document.querySelector('.annotation-item input[name^="narrative_roles_"]');
+    const positiveSuperior = ['hero', 'sage', 'charmer', 'winner'];
+    const negativeInferior = ['villain', 'fool', 'monster', 'loser'];
+    const positiveInferior = ['victim'];
+    
+    rolesHtml += roleColumn('Positive/<br>Superior', positiveSuperior);
+    rolesHtml += roleColumn('Negative/<br>Inferior', negativeInferior);
+    rolesHtml += roleColumn('Positive/<br>Inferior', positiveInferior);
+    rolesHtml += '</div>';
+    const unclearHtml = '<div class="flex items-center gap-3"><label class="inline-flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" name="unclear_case_temp" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]">Flag unclear case</label></div>';
+    
+    newAnnotation.innerHTML = `
+        <div class="flex items-start justify-between gap-4">
+            <h3 class="text-lg font-semibold text-slate-900">Annotation ${count + 1}</h3>
+            <button type="button" class="rounded-full border border-[#845EF7] px-3 py-2 text-sm font-semibold text-[#845EF7] transition hover:bg-[#845EF7] hover:text-white" onclick="deleteAnnotationSet(this)">Delete</button>
+        </div>
+        <div class="space-y-4">
+            <fieldset class="space-y-3">
+                <legend class="text-sm font-semibold text-slate-700">Social Identity</legend>
+                ${socialIdentityHtml}
+            </fieldset>
+            <fieldset class="space-y-3">
+                <legend class="text-sm font-semibold text-slate-700">View Point</legend>
+                <div class="flex flex-wrap gap-3">
+                    <label class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 hover:border-[#00C9A7]">
+                        <input type="radio" name="view_point_temp" value="in_group" class="h-4 w-4 text-[#00C9A7]">
+                        In Group
+                    </label>
+                    <label class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 hover:border-[#00C9A7]">
+                        <input type="radio" name="view_point_temp" value="out_group" class="h-4 w-4 text-[#00C9A7]">
+                        Out Group
+                    </label>
+                </div>
+            </fieldset>
+            <fieldset class="space-y-3">
+                <legend class="text-sm font-semibold text-slate-700">Narrative Roles</legend>
+                ${rolesHtml}
+            </fieldset>
+            ${unclearHtml}
+            <div>
+                <label class="block text-sm font-semibold text-slate-700">Comments</label>
+                <textarea name="comments" placeholder="Optional: add notes about nuances..." class="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15"></textarea>
+            </div>
+        </div>
+    `;
+    container.appendChild(newAnnotation);
+}
+
+function deleteAnnotationSet(btn) {
+    const container = document.getElementById('annotations-container');
+    const items = container.querySelectorAll('.annotation-item');
+    if (items.length === 1) {
+        alert('You must have at least one annotation set.');
+        return;
+    }
+    const annotationItem = btn.closest('.annotation-item');
+    annotationItem.remove();
+}
+</script>
+{% endblock %}

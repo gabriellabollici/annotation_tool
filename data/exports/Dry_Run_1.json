@@ -1,0 +1,42 @@
+[
+    {
+        "id": "48da9d6a-e662-4cab-839c-55c4e4a26bea",
+        "image_filename": "memes_6847.png",
+        "comments": "This is a test comment 2",
+        "annotator_name": "test_annotator",
+        "labels": {
+            "social_identity": "liberals",
+            "view_point": "in_group",
+            "narrative_roles": [
+                "hero"
+            ]
+        },
+        "date_time": "2026-05-15T15:22:38.673434"
+    },
+    {
+        "id": "48da9d6a-e662-4cab-839c-55c4e4a26bea",
+        "image_filename": "memes_6847.png",
+        "comments": "",
+        "annotator_name": "test_user",
+        "labels": {
+            "social_identity": "women",
+            "view_point": "",
+            "narrative_roles": []
+        },
+        "date_time": "2026-05-15T15:48:13.726423"
+    },
+    {
+        "id": "48da9d6a-e662-4cab-839c-55c4e4a26bea",
+        "image_filename": "memes_6847.png",
+        "comments": "Test comment",
+        "annotator_name": "test_user2",
+        "labels": {
+            "social_identity": "women, feminist, custom_label",
+            "view_point": "in_group",
+            "narrative_roles": [
+                "hero"
+            ]
+        },
+        "date_time": "2026-05-15T15:49:35.266226"
+    }
+]

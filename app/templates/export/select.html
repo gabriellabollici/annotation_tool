@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Export - {{ project.name }}{% endblock %}
+{% block content %}
+<div class="space-y-8">
+    <div class="rounded-[1.75rem] bg-white/90 p-8 shadow-sm ring-1 ring-slate-200">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[#845EF7]">Export</p>
+                <h2 class="mt-3 text-3xl font-semibold text-slate-900">{{ project.name }}</h2>
+                <p class="mt-3 text-sm leading-6 text-slate-600">Select images to export along with all annotator data.</p>
+            </div>
+            <button type="button" id="select-all-btn" class="inline-flex items-center justify-center rounded-full border border-[#00C9A7] px-4 py-3 text-sm font-semibold text-[#00C9A7] transition hover:bg-[#00C9A7] hover:text-white" onclick="toggleAll()">Select All</button>
+        </div>
+        <form method="post">
+            <div class="mt-8 overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white/80 shadow-sm">
+                <table class="min-w-full divide-y divide-slate-200">
+                    <thead class="bg-slate-50">
+                        <tr>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.24em] text-slate-600"></th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.24em] text-slate-600">Image</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.24em] text-slate-600">Filename</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.24em] text-slate-600">Annotations</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200 bg-white">
+                    {% for image in images %}
+                    <tr>
+                        <td class="px-6 py-4"><input type="checkbox" name="image_ids" value="{{ image.id }}" class="image-checkbox h-4 w-4 rounded border-slate-300 text-[#00C9A7] focus:ring-[#00C9A7]"></td>
+                        <td class="px-6 py-4">
+                            <img src="/static/uploads/{{ project.id }}/{{ image.filename }}" alt="{{ image.filename }}" class="h-14 w-20 rounded-2xl object-cover">
+                        </td>
+                        <td class="px-6 py-4 text-sm text-slate-900">{{ image.filename }}</td>
+                        <td class="px-6 py-4 text-sm text-slate-600">
+                            {% if image.annotations %}
+                                {{ image.annotations | length }} annotation(s)
+                                <div class="mt-2 text-xs text-slate-400">({% for ann in image.annotations %}{{ ann.annotated_by }}{% if not loop.last %}, {% endif %}{% endfor %})</div>
+                            {% else %}
+                                <span class="text-slate-400">None</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+            <button type="submit" class="mt-8 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#00C9A7] to-[#845EF7] px-5 py-3 text-sm font-semibold text-white shadow-sm">📤 Export Selected</button>
+        </form>
+    </div>
+    <a href="/projects/{{ project.id }}/images" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 transition hover:text-[#00C9A7]">← Back to Images</a>
+</div>
+
+<script>
+function toggleAll() {
+    const checkboxes = document.querySelectorAll('.image-checkbox');
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    checkboxes.forEach(cb => cb.checked = !allChecked);
+}
+</script>
+{% endblock %}

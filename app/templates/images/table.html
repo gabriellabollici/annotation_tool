@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block title %}{{ project.name }} - Images{% endblock %}
+{% block content %}
+<div class="space-y-8">
+    <div class="flex flex-col gap-4 rounded-[1.75rem] bg-white/90 p-6 shadow-sm ring-1 ring-slate-200 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[#845EF7]">{{ project.name }} — Images</p>
+            <h2 class="mt-3 text-3xl font-semibold text-slate-900">Image Library</h2>
+            <p class="mt-2 text-sm text-slate-600">Filter, review, and annotate images for this project.</p>
+        </div>
+        <div class="flex flex-wrap gap-3 items-center">
+            {% if not is_admin and image_data %}
+            <a href="/projects/{{ project.id }}/images/annotate-all" class="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#00C9A7] to-[#845EF7] px-5 py-3 text-sm font-semibold text-white shadow-sm hover:opacity-95">🖊️ Annotate All</a>
+            {% endif %}
+            {% if is_admin %}
+            <form method="post" action="/projects/{{ project.id }}/images/import" enctype="multipart/form-data" class="flex flex-wrap items-center gap-3" id="import-form">
+                <input type="file" name="files" multiple accept="image/*" id="file-input" class="hidden">
+                <button type="button" class="inline-flex items-center justify-center rounded-full border border-[#00C9A7] px-4 py-3 text-sm font-semibold text-[#00C9A7] transition hover:bg-[#00C9A7] hover:text-white" onclick="document.getElementById('file-input').click()">📥 Import Images</button>
+                <span id="file-info" class="text-sm text-slate-500"></span>
+                <button type="submit" class="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#00C9A7] to-[#845EF7] px-4 py-3 text-sm font-semibold text-white shadow-sm hidden" id="upload-btn">Upload</button>
+            </form>
+            <a href="/projects/{{ project.id }}/export" class="inline-flex items-center justify-center rounded-full border border-[#00C9A7] bg-white px-4 py-3 text-sm font-semibold text-[#00C9A7] transition hover:bg-[#00C9A7] hover:text-white">📤 Export JSON</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <form method="get" action="/projects/{{ project.id }}/images" class="grid gap-4 rounded-[1.75rem] bg-white/90 p-6 shadow-sm ring-1 ring-slate-200 sm:grid-cols-2 lg:grid-cols-3">
+        <label class="block">
+            <span class="text-sm font-semibold text-slate-700">Filter by filename</span>
+            <input type="text" name="filter_text" value="{{ filter_text }}" placeholder="Search..." class="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15">
+        </label>
+        <label>
+            <span class="text-sm font-semibold text-slate-700">Sort by</span>
+            <select name="sort_by" class="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15">
+                <option value="imported_at" {% if sort_by == 'imported_at' %}selected{% endif %}>Import Date</option>
+                <option value="filename" {% if sort_by == 'filename' %}selected{% endif %}>Filename</option>
+            </select>
+        </label>
+        <label>
+            <span class="text-sm font-semibold text-slate-700">Order</span>
+            <select name="order" class="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15">
+                <option value="desc" {% if order == 'desc' %}selected{% endif %}>Descending</option>
+                <option value="asc" {% if order == 'asc' %}selected{% endif %}>Ascending</option>
+            </select>
+        </label>
+    </form>
+
+    {% if image_data %}
+    <div class="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white/80 shadow-sm">
+        <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50">
+                <tr>
+                    <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.24em] text-slate-600">ID</th>
+                    <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.24em] text-slate-600">Image</th>
+                    <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.24em] text-slate-600">Filename</th>
+                    <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.24em] text-slate-600">Your Annotation</th>
+                    {% if is_admin %}
+                    <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.24em] text-slate-600">All Annotators</th>
+                    {% endif %}
+                    <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.24em] text-slate-600">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 bg-white">
+                {% for item in image_data %}
+                <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4 text-sm text-slate-900"><code>{{ item.image.id[:8] }}</code></td>
+                    <td class="px-6 py-4">
+                        <img src="/static/uploads/{{ project.id }}/{{ item.image.filename }}" alt="{{ item.image.filename }}" class="h-16 w-20 rounded-2xl object-cover">
+                    </td>
+                    <td class="px-6 py-4 text-sm text-slate-900">{{ item.image.filename }}</td>
+                    <td class="px-6 py-4 text-sm text-slate-600">
+                        {% if item.user_annotation %}
+                            <span class="font-semibold text-[#00C9A7]">✓</span> {{ item.user_annotation.completed_at.strftime('%Y-%m-%d %H:%M') }}
+                            {% if item.user_annotation.unclear_case %}
+                            <span class="ml-2 inline-flex rounded-full bg-[#FEE2E2] px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#B91C1C]">Unclear</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="text-slate-400">—</span>
+                        {% endif %}
+                    </td>
+                    {% if is_admin %}
+                    <td class="px-6 py-4 text-sm text-slate-600">
+                        {% if item.all_annotations %}
+                            {% for ann in item.all_annotations %}
+                                <span class="mr-1">{{ ann.annotated_by }}{% if not loop.last %},{% endif %}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="text-slate-400">—</span>
+                        {% endif %}
+                    </td>
+                    {% endif %}
+                    <td class="px-6 py-4">
+                        <div class="flex flex-wrap gap-3">
+                            <a href="/images/{{ item.image.id }}/annotate" class="inline-flex min-w-[110px] items-center justify-center rounded-full border border-[#00C9A7] px-4 py-2 text-sm font-semibold text-[#00C9A7] transition hover:bg-[#00C9A7] hover:text-white">Annotate</a>
+                            {% if item.user_annotation %}
+                            <form method="post" action="/annotations/{{ item.user_annotation.id }}/delete" class="inline-flex" onsubmit="return confirm('Delete your annotation?')">
+                                <button type="submit" class="inline-flex min-w-[110px] items-center justify-center rounded-full border border-[#845EF7] px-4 py-2 text-sm font-semibold text-[#845EF7] transition hover:bg-[#845EF7] hover:text-white">🗑 My Ann.</button>
+                            </form>
+                            {% endif %}
+                            {% if is_admin %}
+                            <form method="post" action="/images/{{ item.image.id }}/delete" class="inline-flex" onsubmit="return confirm('Delete this image and ALL its annotations?')">
+                                <button type="submit" class="inline-flex min-w-[110px] items-center justify-center rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-[#00C9A7] hover:text-[#00C9A7]">🗑 Image</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="rounded-[1.75rem] border border-slate-200 bg-white/85 p-8 text-sm text-slate-600 shadow-sm">
+        {% if is_admin %}
+        No images imported yet. Click "Import Images" to select image files from your computer.
+        {% else %}
+        No images available yet. Contact an administrator to import images.
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <a href="/projects" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 transition hover:text-[#00C9A7]">← Back to Projects</a>
+</div>
+
+<script>
+document.getElementById('file-input').addEventListener('change', function() {
+    const info = document.getElementById('file-info');
+    const btn = document.getElementById('upload-btn');
+    if (this.files.length > 0) {
+        info.textContent = this.files.length + ' file' + (this.files.length > 1 ? 's' : '') + ' selected';
+        btn.classList.remove('hidden');
+    } else {
+        info.textContent = '';
+        btn.classList.add('hidden');
+    }
+});
+</script>
+{% endblock %}
