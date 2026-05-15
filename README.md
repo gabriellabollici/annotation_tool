@@ -7,8 +7,8 @@ A browser-based image annotation tool built with FastAPI, SQLAlchemy, and HTMX. 
 - **Projects** — Organize images into named projects
 - **Image import** — Upload images (jpg, png, gif, webp, bmp, tiff) into a project
 - **Annotation** — Label each image with:
-  - Social identity (free text)
-  - View point (selection)
+  - Social identity (selection or free text)
+  - View point (binary selection)
   - Narrative roles (multi-select: hero, sage, charmer, winner, villain, fool, monster, loser, victim)
 - **Multi-user** — Each user annotates independently; one annotation per user per image
 - **Export** — Admins export annotations as JSON
