@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Uploads
+static/uploads/*
+!static/uploads/.gitkeep
+
+# Database
+data/*.db
+
+# Exports
+data/exports/
+
+# Environment
+.env
+*.env
+
+# Editor
+.vscode/
+.idea/
