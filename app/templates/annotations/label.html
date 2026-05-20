@@ -47,7 +47,7 @@
                                 <fieldset class="space-y-3">
                                     <legend class="text-sm font-semibold text-slate-700">Social Identity</legend>
                                     <div class="space-y-2">
-                                        {% set social_identity_options = ['women', 'men', 'feminist', 'anti-feminist', 'misogynist/male supremacist', 'sex-worker', 'voter', 'abstentionist', 'republican', 'democrat', 'liberal', 'progressive', 'conservative', 'libertarian', 'authoritarian', 'green party supporter', 'politically disillusioned', 'climate change skeptic/denier', 'climate activist', 'corporativist', 'LGTBQ+ rights supporter'] %}
+                                        {% set social_identity_options = ['women', 'men', 'celebrity', 'feminist', 'anti-feminist', 'misogynist/male supremacist', 'sex-worker', 'voter', 'abstentionist', 'republican', 'democrat', 'liberal', 'progressive', 'conservative', 'libertarian', 'authoritarian', 'green party supporter', 'politically disillusioned', 'climate change skeptic/denier', 'climate activist', 'corporativist', 'LGTBQ+ rights supporter'] %}
                                         {% set selected_identities = ann.social_identity.split(', ') if ann.social_identity else [] %}
                                         {% set other_label = '' %}
                                         {% for identity in selected_identities %}
@@ -58,7 +58,11 @@
                                         {% for option in social_identity_options %}
                                         <label class="flex items-center gap-2 text-sm text-slate-700">
                                             <input type="checkbox" name="social_identity_{{ ann_index }}" value="{{ option }}" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]" {% if option in selected_identities %}checked{% endif %}>
-                                            {{ option | capitalize }}
+                                            {% if option == 'LGTBQ+ rights supporter' %}
+                                                LGTBQ+ rights supporter
+                                            {% else %}
+                                                {{ option | capitalize }}
+                                            {% endif %}
                                         </label>
                                         {% endfor %}
                                         <div class="mt-3 pt-3 border-t border-slate-300">
@@ -82,33 +86,39 @@
                                 </fieldset>
                                 <fieldset class="space-y-3">
                                     <legend class="text-sm font-semibold text-slate-700">Narrative Roles</legend>
-                                    <div class="grid gap-4 md:grid-cols-3">
-                                        <div class="space-y-3 rounded-2xl border border-slate-200 bg-white p-4">
-                                            <p class="text-sm font-semibold leading-5 whitespace-normal break-words text-slate-700">Positive/<br>Superior</p>
-                                            {% for role in narrative_roles_options['positive_superior'] %}
-                                            <label class="flex items-center gap-2 text-sm text-slate-700">
-                                                <input type="checkbox" name="narrative_roles_{{ ann_index }}" value="{{ role }}" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]" {% if role in ann.parsed_roles %}checked{% endif %}>
-                                                {{ role | capitalize }}
-                                            </label>
-                                            {% endfor %}
+                                    <div class="narrative-roles-container" style="display: flex !important; flex-direction: row !important; gap: 8px !important; width: 100% !important; align-items: stretch !important;">
+                                        <div class="narrative-role-card" style="flex: 1 !important; min-width: 100px !important; background: #ffffff !important; border: 1px solid #e2e8f0 !important; border-radius: 12px !important; padding: 10px !important; box-sizing: border-box !important; display: flex !important; flex-direction: column !important;">
+                                            <p class="text-xs font-semibold leading-tight text-slate-700 mb-2" style="word-break: keep-all !important; overflow-wrap: break-word !important; margin-bottom: 0.5rem !important;">Positive/<br>Superior</p>
+                                            <div class="space-y-1">
+                                                {% for role in narrative_roles_options['positive_superior'] %}
+                                                <label class="flex items-center gap-1.5 text-xs text-slate-700" style="margin-bottom: 0.35rem !important;">
+                                                    <input type="checkbox" name="narrative_roles_{{ ann_index }}" value="{{ role }}" class="h-3.5 w-4 rounded border-slate-300 text-[#00C9A7]" {% if role in ann.parsed_roles %}checked{% endif %}>
+                                                    {{ role | capitalize }}
+                                                </label>
+                                                {% endfor %}
+                                            </div>
                                         </div>
-                                        <div class="space-y-3 rounded-2xl border border-slate-200 bg-white p-4">
-                                            <p class="text-sm font-semibold leading-5 whitespace-normal break-words text-slate-700">Negative/<br>Inferior</p>
-                                            {% for role in narrative_roles_options['negative_inferior'] %}
-                                            <label class="flex items-center gap-2 text-sm text-slate-700">
-                                                <input type="checkbox" name="narrative_roles_{{ ann_index }}" value="{{ role }}" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]" {% if role in ann.parsed_roles %}checked{% endif %}>
-                                                {{ role | capitalize }}
-                                            </label>
-                                            {% endfor %}
+                                        <div class="narrative-role-card" style="flex: 1 !important; min-width: 100px !important; background: #ffffff !important; border: 1px solid #e2e8f0 !important; border-radius: 12px !important; padding: 10px !important; box-sizing: border-box !important; display: flex !important; flex-direction: column !important;">
+                                            <p class="text-xs font-semibold leading-tight text-slate-700 mb-2" style="word-break: keep-all !important; overflow-wrap: break-word !important; margin-bottom: 0.5rem !important;">Negative/<br>Inferior</p>
+                                            <div class="space-y-1">
+                                                {% for role in narrative_roles_options['negative_inferior'] %}
+                                                <label class="flex items-center gap-1.5 text-xs text-slate-700" style="margin-bottom: 0.35rem !important;">
+                                                    <input type="checkbox" name="narrative_roles_{{ ann_index }}" value="{{ role }}" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]" {% if role in ann.parsed_roles %}checked{% endif %}>
+                                                    {{ role | capitalize }}
+                                                </label>
+                                                {% endfor %}
+                                            </div>
                                         </div>
-                                        <div class="space-y-3 rounded-2xl border border-slate-200 bg-white p-4">
-                                            <p class="text-sm font-semibold leading-5 whitespace-normal break-words text-slate-700">Positive/<br>Inferior</p>
-                                            {% for role in narrative_roles_options['positive_inferior'] %}
-                                            <label class="flex items-center gap-2 text-sm text-slate-700">
-                                                <input type="checkbox" name="narrative_roles_{{ ann_index }}" value="{{ role }}" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]" {% if role in ann.parsed_roles %}checked{% endif %}>
-                                                {{ role | capitalize }}
-                                            </label>
-                                            {% endfor %}
+                                        <div class="narrative-role-card" style="flex: 1 !important; min-width: 100px !important; background: #ffffff !important; border: 1px solid #e2e8f0 !important; border-radius: 12px !important; padding: 10px !important; box-sizing: border-box !important; display: flex !important; flex-direction: column !important;">
+                                            <p class="text-xs font-semibold leading-tight text-slate-700 mb-2" style="word-break: keep-all !important; overflow-wrap: break-word !important; margin-bottom: 0.5rem !important;">Positive/<br>Inferior</p>
+                                            <div class="space-y-1">
+                                                {% for role in narrative_roles_options['positive_inferior'] %}
+                                                <label class="flex items-center gap-1.5 text-xs text-slate-700" style="margin-bottom: 0.35rem !important;">
+                                                    <input type="checkbox" name="narrative_roles_{{ ann_index }}" value="{{ role }}" class="h-3.5 w-4 rounded border-slate-300 text-[#00C9A7]" {% if role in ann.parsed_roles %}checked{% endif %}>
+                                                    {{ role | capitalize }}
+                                                </label>
+                                                {% endfor %}
+                                            </div>
                                         </div>
                                     </div>
                                 </fieldset>
@@ -134,13 +144,17 @@
                                 <fieldset class="space-y-3">
                                     <legend class="text-sm font-semibold text-slate-700">Social Identity</legend>
                                     <div class="space-y-2">
-                                        {% set social_identity_options = ['women', 'men', 'feminist', 'anti-feminist', 'misogynist/male supremacist', 'sex-worker', 'voter', 'abstentionist', 'republican', 'democrat', 'liberal', 'progressive', 'conservative', 'libertarian', 'authoritarian', 'green party supporter', 'politically disillusioned', 'climate change skeptic/denier', 'climate activist', 'corporativist', 'LGTBQ+ rights supporter'] %}
+                                        {% set social_identity_options = ['women', 'men', 'celebrity', 'feminist', 'anti-feminist', 'misogynist/male supremacist', 'sex-worker', 'voter', 'abstentionist', 'republican', 'democrat', 'liberal', 'progressive', 'conservative', 'libertarian', 'authoritarian', 'green party supporter', 'politically disillusioned', 'climate change skeptic/denier', 'climate activist', 'corporativist', 'LGTBQ+ rights supporter'] %}
                                         {% set selected_identities = [] %}
                                         {% set other_label = '' %}
                                         {% for option in social_identity_options %}
                                         <label class="flex items-center gap-2 text-sm text-slate-700">
                                             <input type="checkbox" name="social_identity_0" value="{{ option }}" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]">
-                                            {{ option | capitalize }}
+                                            {% if option == 'LGTBQ+ rights supporter' %}
+                                                LGTBQ+ rights supporter
+                                            {% else %}
+                                                {{ option | capitalize }}
+                                            {% endif %}
                                         </label>
                                         {% endfor %}
                                         <div class="mt-3 pt-3 border-t border-slate-300">
@@ -164,33 +178,39 @@
                                 </fieldset>
                                 <fieldset class="space-y-3">
                                     <legend class="text-sm font-semibold text-slate-700">Narrative Roles</legend>
-                                    <div class="grid gap-4 md:grid-cols-3">
-                                        <div class="space-y-3 rounded-2xl border border-slate-200 bg-white p-4">
-                                            <p class="text-sm font-semibold leading-5 whitespace-normal break-words text-slate-700">Positive/<br>Superior</p>
-                                            {% for role in narrative_roles_options['positive_superior'] %}
-                                            <label class="flex items-center gap-2 text-sm text-slate-700">
-                                                <input type="checkbox" name="narrative_roles_0" value="{{ role }}" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]">
-                                                {{ role | capitalize }}
-                                            </label>
-                                            {% endfor %}
+                                    <div class="narrative-roles-container" style="display: flex !important; flex-direction: row !important; gap: 8px !important; width: 100% !important; align-items: stretch !important;">
+                                        <div class="narrative-role-card" style="flex: 1 !important; min-width: 100px !important; background: #ffffff !important; border: 1px solid #e2e8f0 !important; border-radius: 12px !important; padding: 10px !important; box-sizing: border-box !important; display: flex !important; flex-direction: column !important;">
+                                            <p class="text-xs font-semibold leading-tight text-slate-700 mb-2" style="word-break: keep-all !important; overflow-wrap: break-word !important; margin-bottom: 0.5rem !important;">Positive/<br>Superior</p>
+                                            <div class="space-y-1">
+                                                {% for role in narrative_roles_options['positive_superior'] %}
+                                                <label class="flex items-center gap-1.5 text-xs text-slate-700" style="margin-bottom: 0.35rem !important;">
+                                                    <input type="checkbox" name="narrative_roles_0" value="{{ role }}" class="h-3.5 w-4 rounded border-slate-300 text-[#00C9A7]">
+                                                    {{ role | capitalize }}
+                                                </label>
+                                                {% endfor %}
+                                            </div>
                                         </div>
-                                        <div class="space-y-3 rounded-2xl border border-slate-200 bg-white p-4">
-                                            <p class="text-sm font-semibold leading-5 whitespace-normal break-words text-slate-700">Negative/<br>Inferior</p>
-                                            {% for role in narrative_roles_options['negative_inferior'] %}
-                                            <label class="flex items-center gap-2 text-sm text-slate-700">
-                                                <input type="checkbox" name="narrative_roles_0" value="{{ role }}" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]">
-                                                {{ role | capitalize }}
-                                            </label>
-                                            {% endfor %}
+                                        <div class="narrative-role-card" style="flex: 1 !important; min-width: 100px !important; background: #ffffff !important; border: 1px solid #e2e8f0 !important; border-radius: 12px !important; padding: 10px !important; box-sizing: border-box !important; display: flex !important; flex-direction: column !important;">
+                                            <p class="text-xs font-semibold leading-tight text-slate-700 mb-2" style="word-break: keep-all !important; overflow-wrap: break-word !important; margin-bottom: 0.5rem !important;">Negative/<br>Inferior</p>
+                                            <div class="space-y-1">
+                                                {% for role in narrative_roles_options['negative_inferior'] %}
+                                                <label class="flex items-center gap-1.5 text-xs text-slate-700" style="margin-bottom: 0.35rem !important;">
+                                                    <input type="checkbox" name="narrative_roles_0" value="{{ role }}" class="h-3.5 w-4 rounded border-slate-300 text-[#00C9A7]">
+                                                    {{ role | capitalize }}
+                                                </label>
+                                                {% endfor %}
+                                            </div>
                                         </div>
-                                        <div class="space-y-3 rounded-2xl border border-slate-200 bg-white p-4">
-                                            <p class="text-sm font-semibold leading-5 whitespace-normal break-words text-slate-700">Positive/<br>Inferior</p>
-                                            {% for role in narrative_roles_options['positive_inferior'] %}
-                                            <label class="flex items-center gap-2 text-sm text-slate-700">
-                                                <input type="checkbox" name="narrative_roles_0" value="{{ role }}" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]">
-                                                {{ role | capitalize }}
-                                            </label>
-                                            {% endfor %}
+                                        <div class="narrative-role-card" style="flex: 1 !important; min-width: 100px !important; background: #ffffff !important; border: 1px solid #e2e8f0 !important; border-radius: 12px !important; padding: 10px !important; box-sizing: border-box !important; display: flex !important; flex-direction: column !important;">
+                                            <p class="text-xs font-semibold leading-tight text-slate-700 mb-2" style="word-break: keep-all !important; overflow-wrap: break-word !important; margin-bottom: 0.5rem !important;">Positive/<br>Inferior</p>
+                                            <div class="space-y-1">
+                                                {% for role in narrative_roles_options['positive_inferior'] %}
+                                                <label class="flex items-center gap-1.5 text-xs text-slate-700" style="margin-bottom: 0.35rem !important;">
+                                                    <input type="checkbox" name="narrative_roles_0" value="{{ role }}" class="h-3.5 w-4 rounded border-slate-300 text-[#00C9A7]">
+                                                    {{ role | capitalize }}
+                                                </label>
+                                                {% endfor %}
+                                            </div>
                                         </div>
                                     </div>
                                 </fieldset>
@@ -219,7 +239,7 @@
 </div>
 
 <script>
-const socialIdentityOptions = ['women', 'men', 'feminist', 'anti-feminist', 'misogynist/male supremacist', 'sex-worker', 'voter', 'abstentionist', 'republican', 'democrat', 'liberal', 'progressive', 'conservative', 'libertarian', 'authoritarian', 'green party supporter', 'politically disillusioned', 'climate change skeptic/denier', 'climate activist', 'corporativist', 'LGTBQ+ rights supporter'];
+const socialIdentityOptions = ['women', 'men', 'celebrity', 'feminist', 'anti-feminist', 'misogynist/male supremacist', 'sex-worker', 'voter', 'abstentionist', 'republican', 'democrat', 'liberal', 'progressive', 'conservative', 'libertarian', 'authoritarian', 'green party supporter', 'politically disillusioned', 'climate change skeptic/denier', 'climate activist', 'corporativist', 'LGTBQ+ rights supporter'];
 
 function renumberAnnotations(event) {
     const container = document.getElementById('annotations-container');
@@ -262,19 +282,22 @@ function addAnnotation() {
     // Build social identity checkboxes
     let socialIdentityHtml = '<div class="space-y-2">';
     socialIdentityOptions.forEach(option => {
-        socialIdentityHtml += `<label class="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" name="social_identity_temp" value="${option}" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]">${option.charAt(0).toUpperCase() + option.slice(1)}</label>`;
+        const labelText = option === 'LGTBQ+ rights supporter' ? 'LGTBQ+ rights supporter' : option.charAt(0).toUpperCase() + option.slice(1);
+        socialIdentityHtml += `<label class="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" name="social_identity_temp" value="${option}" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]">${labelText}</label>`;
     });
     socialIdentityHtml += '<div class="mt-3 pt-3 border-t border-slate-300"><label class="block text-xs font-semibold text-slate-600 mb-2">Other label:</label><input type="text" name="other_label_temp" placeholder="Add a label not listed above..." class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15"></div>';
     socialIdentityHtml += '</div>';
     
     // Build narrative roles checkboxes
-    let rolesHtml = '<div class="grid gap-4 md:grid-cols-3">';
+    let rolesHtml = '<div class="narrative-roles-container" style="display: flex !important; flex-direction: row !important; gap: 8px !important; width: 100% !important; align-items: stretch !important;">';
     function roleColumn(title, roles) {
-        let content = `<div class="space-y-3 rounded-2xl border border-slate-200 bg-white p-4"><p class="text-sm font-semibold leading-5 whitespace-normal break-words text-slate-700">${title}</p>`;
+        let content = `<div class="narrative-role-card" style="flex: 1 !important; min-width: 100px !important; background: #ffffff !important; border: 1px solid #e2e8f0 !important; border-radius: 12px !important; padding: 10px !important; box-sizing: border-box !important; display: flex !important; flex-direction: column !important;">
+            <p class="text-xs font-semibold leading-tight text-slate-700 mb-2" style="word-break: keep-all !important; overflow-wrap: break-word !important; margin-bottom: 0.5rem !important;">${title.replace(' / ', '/<br>')}</p>
+            <div class="space-y-1">`;
         roles.forEach(role => {
-            content += `<label class="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" name="narrative_roles_temp" value="${role}" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]">${role.charAt(0).toUpperCase() + role.slice(1)}</label>`;
+            content += `<label class="flex items-center gap-1.5 text-xs text-slate-700" style="margin-bottom: 0.35rem !important;"><input type="checkbox" name="narrative_roles_temp" value="${role}" class="h-3.5 w-4 rounded border-slate-300 text-[#00C9A7]">${role.charAt(0).toUpperCase() + role.slice(1)}</label>`;
         });
-        return content + '</div>';
+        return content + '</div></div>';
     }
     // Get narrative roles from the page
     const existingRoles = document.querySelector('.annotation-item input[name^="narrative_roles_"]');
@@ -282,9 +305,9 @@ function addAnnotation() {
     const negativeInferior = ['villain', 'fool', 'monster', 'loser'];
     const positiveInferior = ['victim'];
     
-    rolesHtml += roleColumn('Positive/<br>Superior', positiveSuperior);
-    rolesHtml += roleColumn('Negative/<br>Inferior', negativeInferior);
-    rolesHtml += roleColumn('Positive/<br>Inferior', positiveInferior);
+    rolesHtml += roleColumn('Positive / Superior', positiveSuperior);
+    rolesHtml += roleColumn('Negative / Inferior', negativeInferior);
+    rolesHtml += roleColumn('Positive / Inferior', positiveInferior);
     rolesHtml += '</div>';
     const unclearHtml = '<div class="flex items-center gap-3"><label class="inline-flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" name="unclear_case_temp" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]">Flag unclear case</label></div>';
     

@@ -125,6 +125,7 @@ async def save_annotation(
     if not username:
         return RedirectResponse(url="/login", status_code=302)
 
+    image = None
     try:
         form = await request.form()
         
@@ -225,7 +226,10 @@ async def save_annotation(
         print(f"Error saving annotation: {str(e)}")
         import traceback
         traceback.print_exc()
-        return RedirectResponse(url=f"/projects/{image.project_id}/images", status_code=302)
+        if image:
+            return RedirectResponse(url=f"/projects/{image.project_id}/images", status_code=302)
+        else:
+            return RedirectResponse(url="/projects", status_code=302)
 
 
 @router.post("/annotations/{annotation_id}/delete")

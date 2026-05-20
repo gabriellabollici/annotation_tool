@@ -2,7 +2,8 @@ from contextlib import asynccontextmanager
 import os
 
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
@@ -17,6 +18,20 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Annotation Tool", lifespan=lifespan)
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    import traceback
+    with open("error.log", "a") as f:
+        f.write(f"\n{'='*50}\n")
+        f.write(f"ERROR: {str(exc)}\n")
+        f.write(traceback.format_exc())
+        f.write(f"{'='*50}\n")
+    return JSONResponse(
+        status_code=500,
+        content={"message": "Internal Server Error", "detail": str(exc)}
+    )
+
 secret_key = os.environ.get("SESSION_SECRET")
 if not secret_key:
     print("WARNING: SESSION_SECRET is not set. Using a development secret key.")

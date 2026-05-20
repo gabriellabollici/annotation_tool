@@ -1,0 +1,41 @@
+INFO:     Will watch for changes in these directories: ['/Users/gabriellabollicimoreno/Desktop/annotation_tool']
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [96307] using WatchFiles
+INFO:     Started server process [96310]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:64591 - "GET /images/48da9d6a-e662-4cab-839c-55c4e4a26bea/annotate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64592 - "POST /images/48da9d6a-e662-4cab-839c-55c4e4a26bea/annotate HTTP/1.1" 302 Found
+INFO:     127.0.0.1:64592 - "GET /projects/1/images HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64592 - "GET /projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64592 - "GET /projects/1/images HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64592 - "GET /images/48da9d6a-e662-4cab-839c-55c4e4a26bea/annotate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64595 - "POST /images/48da9d6a-e662-4cab-839c-55c4e4a26bea/annotate HTTP/1.1" 302 Found
+INFO:     127.0.0.1:64595 - "GET /projects/1/images HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64595 - "GET /images/48da9d6a-e662-4cab-839c-55c4e4a26bea/annotate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64597 - "POST /images/48da9d6a-e662-4cab-839c-55c4e4a26bea/annotate HTTP/1.1" 302 Found
+INFO:     127.0.0.1:64597 - "GET /projects/1/images HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64597 - "GET /images/48da9d6a-e662-4cab-839c-55c4e4a26bea/annotate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64597 - "GET /projects/1/images HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64597 - "POST /annotations/7/delete HTTP/1.1" 302 Found
+INFO:     127.0.0.1:64597 - "GET /projects/1/images HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64597 - "GET /images/48da9d6a-e662-4cab-839c-55c4e4a26bea/annotate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64726 - "GET /images/48da9d6a-e662-4cab-839c-55c4e4a26bea/annotate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65176 - "GET /images/48da9d6a-e662-4cab-839c-55c4e4a26bea/annotate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49298 - "GET /images/48da9d6a-e662-4cab-839c-55c4e4a26bea/annotate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49370 - "GET /images/48da9d6a-e662-4cab-839c-55c4e4a26bea/annotate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49453 - "GET /images/48da9d6a-e662-4cab-839c-55c4e4a26bea/annotate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49860 - "GET /images/48da9d6a-e662-4cab-839c-55c4e4a26bea/annotate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49934 - "GET /images/48da9d6a-e662-4cab-839c-55c4e4a26bea/annotate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49969 - "GET /images/48da9d6a-e662-4cab-839c-55c4e4a26bea/annotate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49970 - "POST /images/48da9d6a-e662-4cab-839c-55c4e4a26bea/annotate HTTP/1.1" 302 Found
+INFO:     127.0.0.1:49970 - "GET /projects/1/images HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49977 - "POST /projects/1/images/import HTTP/1.1" 302 Found
+INFO:     127.0.0.1:49977 - "GET /projects/1/images HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49977 - "GET /images/a02e3ef4-8c29-45ff-87f6-0eb831a094d5/annotate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49980 - "POST /images/a02e3ef4-8c29-45ff-87f6-0eb831a094d5/annotate HTTP/1.1" 302 Found
+INFO:     127.0.0.1:49980 - "GET /projects/1/images HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49982 - "POST /annotations/10/delete HTTP/1.1" 302 Found
+INFO:     127.0.0.1:49982 - "GET /projects/1/images HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49985 - "POST /annotations/9/delete HTTP/1.1" 302 Found
+INFO:     127.0.0.1:49985 - "GET /projects/1/images HTTP/1.1" 200 OK
