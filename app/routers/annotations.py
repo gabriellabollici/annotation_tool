@@ -144,11 +144,20 @@ async def save_annotation(
             await db.delete(ann)
         
         # Parse form data: social_identity_N[], view_point_N, narrative_roles_N[], other_label_N
-        # Determine annotation count from view_point fields (which should always be present)
-        view_point_keys = [key for key in form.keys() if key.startswith("view_point_")]
-        annotation_count = len(set(key.split("_")[-1] for key in view_point_keys)) if view_point_keys else 0
+        # Determine annotation count from ANY field that is part of an annotation set
+        annotation_indices = set()
+        for key in form.keys():
+            if any(key.startswith(prefix) for prefix in ["view_point_", "social_identity_", "narrative_roles_", "other_label_", "unclear_case_"]):
+                try:
+                    index = key.split("_")[-1]
+                    if index.isdigit():
+                        annotation_indices.add(int(index))
+                except (ValueError, IndexError):
+                    continue
         
-        # Fallback: count from comments field
+        annotation_count = max(annotation_indices) + 1 if annotation_indices else 0
+        
+        # Fallback: check comments if no indexed fields found
         if annotation_count == 0:
             comments_list = form.getlist("comments")
             annotation_count = len(comments_list) if comments_list else 1
@@ -156,7 +165,11 @@ async def save_annotation(
             comments_list = form.getlist("comments")
         
         # Create new annotations from form data
+        # Use range(annotation_count) but skip indices that don't have any data if count was high
         for i in range(annotation_count):
+            if i not in annotation_indices and i >= len(comments_list):
+                continue
+
             # Get all selected social identity checkboxes for this annotation
             social_identity_key = f"social_identity_{i}"
             selected_identities = form.getlist(social_identity_key)

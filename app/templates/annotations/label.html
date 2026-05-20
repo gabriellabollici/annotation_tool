@@ -47,7 +47,7 @@
                                 <fieldset class="space-y-3">
                                     <legend class="text-sm font-semibold text-slate-700">Social Identity</legend>
                                     <div class="space-y-2">
-                                        {% set social_identity_options = ['women', 'men', 'feminist', 'anti-feminist', 'misogynist/male supremacist', 'sex-worker', 'voter', 'abstentionist', 'republican', 'democrat', 'liberal', 'progressive', 'conservative', 'libertarian', 'authoritarian', 'green party supporter', 'politically disillusioned', 'climate change skeptic/denier', 'climate activist'] %}
+                                        {% set social_identity_options = ['women', 'men', 'feminist', 'anti-feminist', 'misogynist/male supremacist', 'sex-worker', 'voter', 'abstentionist', 'republican', 'democrat', 'liberal', 'progressive', 'conservative', 'libertarian', 'authoritarian', 'green party supporter', 'politically disillusioned', 'climate change skeptic/denier', 'climate activist', 'corporativist', 'LGTBQ+ rights supporter'] %}
                                         {% set selected_identities = ann.social_identity.split(', ') if ann.social_identity else [] %}
                                         {% set other_label = '' %}
                                         {% for identity in selected_identities %}
@@ -134,7 +134,7 @@
                                 <fieldset class="space-y-3">
                                     <legend class="text-sm font-semibold text-slate-700">Social Identity</legend>
                                     <div class="space-y-2">
-                                        {% set social_identity_options = ['women', 'men', 'feminist', 'anti-feminist', 'misogynist/male supremacist', 'sex-worker', 'voter', 'abstentionist', 'republican', 'democrat', 'liberal', 'progressive', 'conservative', 'libertarian', 'authoritarian', 'green party supporter', 'politically disillusioned', 'climate change skeptic/denier', 'climate activist'] %}
+                                        {% set social_identity_options = ['women', 'men', 'feminist', 'anti-feminist', 'misogynist/male supremacist', 'sex-worker', 'voter', 'abstentionist', 'republican', 'democrat', 'liberal', 'progressive', 'conservative', 'libertarian', 'authoritarian', 'green party supporter', 'politically disillusioned', 'climate change skeptic/denier', 'climate activist', 'corporativist', 'LGTBQ+ rights supporter'] %}
                                         {% set selected_identities = [] %}
                                         {% set other_label = '' %}
                                         {% for option in social_identity_options %}
@@ -219,7 +219,7 @@
 </div>
 
 <script>
-const socialIdentityOptions = ['women', 'men', 'feminist', 'anti-feminist', 'misogynist/male supremacist', 'sex-worker', 'voter', 'abstentionist', 'republican', 'democrat', 'liberal', 'progressive', 'conservative', 'libertarian', 'authoritarian', 'green party supporter', 'politically disillusioned', 'climate change skeptic/denier', 'climate activist'];
+const socialIdentityOptions = ['women', 'men', 'feminist', 'anti-feminist', 'misogynist/male supremacist', 'sex-worker', 'voter', 'abstentionist', 'republican', 'democrat', 'liberal', 'progressive', 'conservative', 'libertarian', 'authoritarian', 'green party supporter', 'politically disillusioned', 'climate change skeptic/denier', 'climate activist', 'corporativist', 'LGTBQ+ rights supporter'];
 
 function renumberAnnotations(event) {
     const container = document.getElementById('annotations-container');
