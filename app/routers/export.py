@@ -102,7 +102,11 @@ async def export_project(
             entry = {
                 "id": image.id,
                 "image_filename": image.filename,
-                "comments": annotation.comments,
+                "comments": {
+                    "social_identity": annotation.social_identity_comments,
+                    "view_point": annotation.view_point_comments,
+                    "narrative_roles": annotation.narrative_roles_comments
+                },
                 "unclear_case": bool(annotation.unclear_case),
                 "annotator_name": annotation.annotated_by,
                 "labels": {

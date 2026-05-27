@@ -32,6 +32,24 @@ def _ensure_unclear_case_column(sync_conn):
             )
 
 
+def _ensure_new_comment_columns(sync_conn):
+    inspector = inspect(sync_conn)
+    if "annotations" in inspector.get_table_names():
+        columns = [col["name"] for col in inspector.get_columns("annotations")]
+        if "social_identity_comments" not in columns:
+            sync_conn.execute(
+                text("ALTER TABLE annotations ADD COLUMN social_identity_comments TEXT NOT NULL DEFAULT ''")
+            )
+        if "view_point_comments" not in columns:
+            sync_conn.execute(
+                text("ALTER TABLE annotations ADD COLUMN view_point_comments TEXT NOT NULL DEFAULT ''")
+            )
+        if "narrative_roles_comments" not in columns:
+            sync_conn.execute(
+                text("ALTER TABLE annotations ADD COLUMN narrative_roles_comments TEXT NOT NULL DEFAULT ''")
+            )
+
+
 def _remove_unique_constraint(sync_conn):
     """Remove the old unique constraint from annotations table if it exists."""
     inspector = inspect(sync_conn)
@@ -57,6 +75,7 @@ async def init_db():
         await conn.run_sync(Base.metadata.create_all)
         await conn.run_sync(_ensure_password_column)
         await conn.run_sync(_ensure_unclear_case_column)
+        await conn.run_sync(_ensure_new_comment_columns)
         await conn.run_sync(_remove_unique_constraint)
 
 

@@ -35,6 +35,24 @@
                 {% endif %}
 
                 <div id="annotations-container" class="space-y-6">
+                    {% set social_identity_options = [
+                        'women', 'men', 
+                        'feminist', 'anti-feminist', 
+                        'LGTBQ+ rights supporter', 'anti-LGTBQ+', 
+                        'racist', 'anti-racist', 
+                        'national identity', 'nationalist/regionalist', 
+                        'progressive', 'conservative', 
+                        'liberal', 'authoritarian', 
+                        'republican', 'democrat', 
+                        'anticapitalist', 'corporativist', 
+                        'voter', 'abstentionist', 
+                        'politicians/government', 'world leaders/elites', 
+                        'media', 'celebrity', 
+                        'green party supporter', 'climate activist', 
+                        'climate change skeptic/denier', 'climate disengaged',
+                        'misogynist/male supremacist', 'sex-worker', 
+                        'libertarian', 'politically disillusioned'
+                    ] %}
                     {% if user_annotations %}
                         {% for ann in user_annotations %}
                         {% set ann_index = loop.index0 %}
@@ -46,42 +64,57 @@
                             <div class="space-y-4">
                                 <fieldset class="space-y-3">
                                     <legend class="text-sm font-semibold text-slate-700">Social Identity</legend>
-                                    <div class="space-y-2">
-                                        {% set social_identity_options = ['women', 'men', 'celebrity', 'feminist', 'anti-feminist', 'misogynist/male supremacist', 'sex-worker', 'voter', 'abstentionist', 'republican', 'democrat', 'liberal', 'progressive', 'conservative', 'libertarian', 'authoritarian', 'green party supporter', 'politically disillusioned', 'climate change skeptic/denier', 'climate activist', 'corporativist', 'LGTBQ+ rights supporter'] %}
+                                    <div class="grid grid-cols-2 gap-x-4 gap-y-2">
                                         {% set selected_identities = ann.social_identity.split(', ') if ann.social_identity else [] %}
-                                        {% set other_label = '' %}
+                                        {% set ns = namespace(other_labels=[]) %}
                                         {% for identity in selected_identities %}
-                                            {% if identity not in social_identity_options %}
-                                                {% set other_label = identity %}
+                                            {% if identity and identity not in social_identity_options %}
+                                                {% set ns.other_labels = ns.other_labels + [identity] %}
                                             {% endif %}
                                         {% endfor %}
+                                        {% set other_label_text = ns.other_labels | join(', ') %}
+                                        
                                         {% for option in social_identity_options %}
-                                        <label class="flex items-center gap-2 text-sm text-slate-700">
-                                            <input type="checkbox" name="social_identity_{{ ann_index }}" value="{{ option }}" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]" {% if option in selected_identities %}checked{% endif %}>
+                                        <label class="flex items-center gap-2 text-xs text-slate-700">
+                                            <input type="checkbox" name="social_identity_{{ ann_index }}" value="{{ option }}" class="h-4 w-4 flex-shrink-0 rounded border-slate-300 text-[#00C9A7]" {% if option in selected_identities %}checked{% endif %}>
                                             {% if option == 'LGTBQ+ rights supporter' %}
                                                 LGTBQ+ rights supporter
+                                            {% elif option == 'anti-LGTBQ+' %}
+                                                Anti-LGTBQ+
                                             {% else %}
                                                 {{ option | capitalize }}
                                             {% endif %}
                                         </label>
                                         {% endfor %}
-                                        <div class="mt-3 pt-3 border-t border-slate-300">
+                                    </div>
+                                    <div class="mt-3 pt-3 border-t border-slate-300 space-y-3">
+                                        <div>
                                             <label class="block text-xs font-semibold text-slate-600 mb-2">Other label:</label>
-                                            <input type="text" name="other_label_{{ ann_index }}" value="{{ other_label }}" placeholder="Add a label not listed above..." class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15">
+                                            <input type="text" name="other_label_{{ ann_index }}" value="{{ other_label_text }}" placeholder="Add a label not listed above..." class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-slate-600 mb-2">Comments on Social Identity:</label>
+                                            <textarea name="si_comments_{{ ann_index }}" placeholder="Optional: notes about social identities..." class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15">{% if ann.social_identity_comments %}{{ ann.social_identity_comments }}{% endif %}</textarea>
                                         </div>
                                     </div>
                                 </fieldset>
                                 <fieldset class="space-y-3">
                                     <legend class="text-sm font-semibold text-slate-700">View Point</legend>
-                                    <div class="flex flex-wrap gap-3">
-                                        <label class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 hover:border-[#00C9A7]">
-                                            <input type="radio" name="view_point_{{ ann_index }}" value="in_group" class="h-4 w-4 text-[#00C9A7]" {% if ann.view_point == 'in_group' %}checked{% endif %}>
-                                            In Group
-                                        </label>
-                                        <label class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 hover:border-[#00C9A7]">
-                                            <input type="radio" name="view_point_{{ ann_index }}" value="out_group" class="h-4 w-4 text-[#00C9A7]" {% if ann.view_point == 'out_group' %}checked{% endif %}>
-                                            Out Group
-                                        </label>
+                                    <div class="space-y-3">
+                                        <div class="flex flex-wrap gap-3">
+                                            <label class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 hover:border-[#00C9A7]">
+                                                <input type="radio" name="view_point_{{ ann_index }}" value="in_group" class="h-4 w-4 text-[#00C9A7]" {% if ann.view_point == 'in_group' %}checked{% endif %}>
+                                                In Group
+                                            </label>
+                                            <label class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 hover:border-[#00C9A7]">
+                                                <input type="radio" name="view_point_{{ ann_index }}" value="out_group" class="h-4 w-4 text-[#00C9A7]" {% if ann.view_point == 'out_group' %}checked{% endif %}>
+                                                Out Group
+                                            </label>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-slate-600 mb-2">Comments on View Point:</label>
+                                            <textarea name="vp_comments_{{ ann_index }}" placeholder="Optional: notes about viewpoint..." class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15">{% if ann.view_point_comments %}{{ ann.view_point_comments }}{% endif %}</textarea>
+                                        </div>
                                     </div>
                                 </fieldset>
                                 <fieldset class="space-y-3">
@@ -121,16 +154,16 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="mt-3">
+                                        <label class="block text-xs font-semibold text-slate-600 mb-2">Comments on Narrative Roles:</label>
+                                        <textarea name="nr_comments_{{ ann_index }}" placeholder="Optional: notes about narrative roles..." class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15">{% if ann.narrative_roles_comments %}{{ ann.narrative_roles_comments }}{% endif %}</textarea>
+                                    </div>
                                 </fieldset>
                                 <div class="flex items-center gap-3">
                                     <label class="inline-flex items-center gap-2 text-sm text-slate-700">
                                         <input type="checkbox" name="unclear_case_{{ ann_index }}" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]" {% if ann.unclear_case %}checked{% endif %}>
                                         Flag unclear case
                                     </label>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-semibold text-slate-700">Comments</label>
-                                    <textarea name="comments" placeholder="Optional: add notes about nuances..." class="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15">{% if ann.comments %}{{ ann.comments }}{% endif %}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -143,37 +176,48 @@
                             <div class="space-y-4">
                                 <fieldset class="space-y-3">
                                     <legend class="text-sm font-semibold text-slate-700">Social Identity</legend>
-                                    <div class="space-y-2">
-                                        {% set social_identity_options = ['women', 'men', 'celebrity', 'feminist', 'anti-feminist', 'misogynist/male supremacist', 'sex-worker', 'voter', 'abstentionist', 'republican', 'democrat', 'liberal', 'progressive', 'conservative', 'libertarian', 'authoritarian', 'green party supporter', 'politically disillusioned', 'climate change skeptic/denier', 'climate activist', 'corporativist', 'LGTBQ+ rights supporter'] %}
-                                        {% set selected_identities = [] %}
-                                        {% set other_label = '' %}
+                                    <div class="grid grid-cols-2 gap-x-4 gap-y-2">
                                         {% for option in social_identity_options %}
-                                        <label class="flex items-center gap-2 text-sm text-slate-700">
-                                            <input type="checkbox" name="social_identity_0" value="{{ option }}" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]">
+                                        <label class="flex items-center gap-2 text-xs text-slate-700">
+                                            <input type="checkbox" name="social_identity_0" value="{{ option }}" class="h-4 w-4 flex-shrink-0 rounded border-slate-300 text-[#00C9A7]">
                                             {% if option == 'LGTBQ+ rights supporter' %}
                                                 LGTBQ+ rights supporter
+                                            {% elif option == 'anti-LGTBQ+' %}
+                                                Anti-LGTBQ+
                                             {% else %}
                                                 {{ option | capitalize }}
                                             {% endif %}
                                         </label>
                                         {% endfor %}
-                                        <div class="mt-3 pt-3 border-t border-slate-300">
+                                    </div>
+                                    <div class="mt-3 pt-3 border-t border-slate-300 space-y-3">
+                                        <div>
                                             <label class="block text-xs font-semibold text-slate-600 mb-2">Other label:</label>
-                                            <input type="text" name="other_label_0" value="{{ other_label }}" placeholder="Add a label not listed above..." class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15">
+                                            <input type="text" name="other_label_0" value="" placeholder="Add a label not listed above..." class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-slate-600 mb-2">Comments on Social Identity:</label>
+                                            <textarea name="si_comments_0" placeholder="Optional: notes about social identities..." class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15"></textarea>
                                         </div>
                                     </div>
                                 </fieldset>
                                 <fieldset class="space-y-3">
                                     <legend class="text-sm font-semibold text-slate-700">View Point</legend>
-                                    <div class="flex flex-wrap gap-3">
-                                        <label class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 hover:border-[#00C9A7]">
-                                            <input type="radio" name="view_point_0" value="in_group" class="h-4 w-4 text-[#00C9A7]">
-                                            In Group
-                                        </label>
-                                        <label class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 hover:border-[#00C9A7]">
-                                            <input type="radio" name="view_point_0" value="out_group" class="h-4 w-4 text-[#00C9A7]">
-                                            Out Group
-                                        </label>
+                                    <div class="space-y-3">
+                                        <div class="flex flex-wrap gap-3">
+                                            <label class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 hover:border-[#00C9A7]">
+                                                <input type="radio" name="view_point_0" value="in_group" class="h-4 w-4 text-[#00C9A7]">
+                                                In Group
+                                            </label>
+                                            <label class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 hover:border-[#00C9A7]">
+                                                <input type="radio" name="view_point_0" value="out_group" class="h-4 w-4 text-[#00C9A7]">
+                                                Out Group
+                                            </label>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-slate-600 mb-2">Comments on View Point:</label>
+                                            <textarea name="vp_comments_0" placeholder="Optional: notes about viewpoint..." class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15"></textarea>
+                                        </div>
                                     </div>
                                 </fieldset>
                                 <fieldset class="space-y-3">
@@ -213,16 +257,16 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="mt-3">
+                                        <label class="block text-xs font-semibold text-slate-600 mb-2">Comments on Narrative Roles:</label>
+                                        <textarea name="nr_comments_0" placeholder="Optional: notes about narrative roles..." class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15"></textarea>
+                                    </div>
                                 </fieldset>
                                 <div class="flex items-center gap-3">
                                     <label class="inline-flex items-center gap-2 text-sm text-slate-700">
                                         <input type="checkbox" name="unclear_case_0" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]">
                                         Flag unclear case
                                     </label>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-semibold text-slate-700">Comments</label>
-                                    <textarea name="comments" placeholder="Optional: add notes about nuances..." class="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -239,33 +283,60 @@
 </div>
 
 <script>
-const socialIdentityOptions = ['women', 'men', 'celebrity', 'feminist', 'anti-feminist', 'misogynist/male supremacist', 'sex-worker', 'voter', 'abstentionist', 'republican', 'democrat', 'liberal', 'progressive', 'conservative', 'libertarian', 'authoritarian', 'green party supporter', 'politically disillusioned', 'climate change skeptic/denier', 'climate activist', 'corporativist', 'LGTBQ+ rights supporter'];
+const socialIdentityOptions = [
+    'women', 'men', 
+    'feminist', 'anti-feminist', 
+    'LGTBQ+ rights supporter', 'anti-LGTBQ+', 
+    'racist', 'anti-racist', 
+    'national identity', 'nationalist/regionalist', 
+    'progressive', 'conservative', 
+    'liberal', 'authoritarian', 
+    'republican', 'democrat', 
+    'anticapitalist', 'corporativist', 
+    'voter', 'abstentionist', 
+    'politicians/government', 'world leaders/elites', 
+    'media', 'celebrity', 
+    'green party supporter', 'climate activist', 
+    'climate change skeptic/denier', 'climate disengaged',
+    'misogynist/male supremacist', 'sex-worker', 
+    'libertarian', 'politically disillusioned'
+];
 
 function renumberAnnotations(event) {
     const container = document.getElementById('annotations-container');
     const items = container.querySelectorAll('.annotation-item');
     
     items.forEach((item, index) => {
-        const allCheckboxes = item.querySelectorAll('input[type="checkbox"]');
-        allCheckboxes.forEach(checkbox => {
+        // Checkboxes
+        item.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
             const name = checkbox.getAttribute('name');
-            if (name && (name.startsWith('narrative_roles_') || name === 'narrative_roles_temp')) {
-                checkbox.setAttribute('name', `narrative_roles_${index}`);
-            } else if (name && (name.startsWith('social_identity_') || name === 'social_identity_temp')) {
-                checkbox.setAttribute('name', `social_identity_${index}`);
-            } else if (name && (name.startsWith('unclear_case_') || name === 'unclear_case_temp')) {
-                checkbox.setAttribute('name', `unclear_case_${index}`);
+            if (name) {
+                if (name.startsWith('narrative_roles_')) checkbox.setAttribute('name', `narrative_roles_${index}`);
+                else if (name.startsWith('social_identity_')) checkbox.setAttribute('name', `social_identity_${index}`);
+                else if (name.startsWith('unclear_case_')) checkbox.setAttribute('name', `unclear_case_${index}`);
             }
         });
         
-        const otherLabelInputs = item.querySelectorAll('input[type="text"][name^="other_label_"], input[type="text"][name="other_label_temp"]');
-        otherLabelInputs.forEach(input => {
-            input.setAttribute('name', `other_label_${index}`);
+        // Text inputs
+        item.querySelectorAll('input[type="text"]').forEach(input => {
+            const name = input.getAttribute('name');
+            if (name && name.startsWith('other_label_')) input.setAttribute('name', `other_label_${index}`);
         });
-        
-        const radios = item.querySelectorAll('input[type="radio"][name^="view_point_"], input[type="radio"][name="view_point_temp"]');
-        radios.forEach(radio => {
-            radio.setAttribute('name', `view_point_${index}`);
+
+        // Radios
+        item.querySelectorAll('input[type="radio"]').forEach(radio => {
+            const name = radio.getAttribute('name');
+            if (name && name.startsWith('view_point_')) radio.setAttribute('name', `view_point_${index}`);
+        });
+
+        // Textareas
+        item.querySelectorAll('textarea').forEach(textarea => {
+            const name = textarea.getAttribute('name');
+            if (name) {
+                if (name.startsWith('si_comments_')) textarea.setAttribute('name', `si_comments_${index}`);
+                else if (name.startsWith('vp_comments_')) textarea.setAttribute('name', `vp_comments_${index}`);
+                else if (name.startsWith('nr_comments_')) textarea.setAttribute('name', `nr_comments_${index}`);
+            }
         });
         
         item.querySelector('h3').textContent = `Annotation ${index + 1}`;
@@ -280,12 +351,13 @@ function addAnnotation() {
     newAnnotation.className = 'annotation-item rounded-[1.25rem] border border-slate-200 bg-slate-50 p-5';
     
     // Build social identity checkboxes
-    let socialIdentityHtml = '<div class="space-y-2">';
+    let socialIdentityHtml = '<div class="grid grid-cols-2 gap-x-4 gap-y-2">';
     socialIdentityOptions.forEach(option => {
-        const labelText = option === 'LGTBQ+ rights supporter' ? 'LGTBQ+ rights supporter' : option.charAt(0).toUpperCase() + option.slice(1);
-        socialIdentityHtml += `<label class="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" name="social_identity_temp" value="${option}" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]">${labelText}</label>`;
+        let labelText = option.charAt(0).toUpperCase() + option.slice(1);
+        if (option === 'LGTBQ+ rights supporter') labelText = 'LGTBQ+ rights supporter';
+        else if (option === 'anti-LGTBQ+') labelText = 'Anti-LGTBQ+';
+        socialIdentityHtml += `<label class="flex items-center gap-2 text-xs text-slate-700"><input type="checkbox" name="social_identity_temp" value="${option}" class="h-4 w-4 flex-shrink-0 rounded border-slate-300 text-[#00C9A7]">${labelText}</label>`;
     });
-    socialIdentityHtml += '<div class="mt-3 pt-3 border-t border-slate-300"><label class="block text-xs font-semibold text-slate-600 mb-2">Other label:</label><input type="text" name="other_label_temp" placeholder="Add a label not listed above..." class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15"></div>';
     socialIdentityHtml += '</div>';
     
     // Build narrative roles checkboxes
@@ -299,8 +371,6 @@ function addAnnotation() {
         });
         return content + '</div></div>';
     }
-    // Get narrative roles from the page
-    const existingRoles = document.querySelector('.annotation-item input[name^="narrative_roles_"]');
     const positiveSuperior = ['hero', 'sage', 'charmer', 'winner'];
     const negativeInferior = ['villain', 'fool', 'monster', 'loser'];
     const positiveInferior = ['victim'];
@@ -309,7 +379,6 @@ function addAnnotation() {
     rolesHtml += roleColumn('Negative / Inferior', negativeInferior);
     rolesHtml += roleColumn('Positive / Inferior', positiveInferior);
     rolesHtml += '</div>';
-    const unclearHtml = '<div class="flex items-center gap-3"><label class="inline-flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" name="unclear_case_temp" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]">Flag unclear case</label></div>';
     
     newAnnotation.innerHTML = `
         <div class="flex items-start justify-between gap-4">
@@ -320,28 +389,49 @@ function addAnnotation() {
             <fieldset class="space-y-3">
                 <legend class="text-sm font-semibold text-slate-700">Social Identity</legend>
                 ${socialIdentityHtml}
+                <div class="mt-3 pt-3 border-t border-slate-300 space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-2">Other label:</label>
+                        <input type="text" name="other_label_temp" placeholder="Add a label not listed above..." class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-2">Comments on Social Identity:</label>
+                        <textarea name="si_comments_temp" placeholder="Optional: notes about social identities..." class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15"></textarea>
+                    </div>
+                </div>
             </fieldset>
             <fieldset class="space-y-3">
                 <legend class="text-sm font-semibold text-slate-700">View Point</legend>
-                <div class="flex flex-wrap gap-3">
-                    <label class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 hover:border-[#00C9A7]">
-                        <input type="radio" name="view_point_temp" value="in_group" class="h-4 w-4 text-[#00C9A7]">
-                        In Group
-                    </label>
-                    <label class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 hover:border-[#00C9A7]">
-                        <input type="radio" name="view_point_temp" value="out_group" class="h-4 w-4 text-[#00C9A7]">
-                        Out Group
-                    </label>
+                <div class="space-y-3">
+                    <div class="flex flex-wrap gap-3">
+                        <label class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 hover:border-[#00C9A7]">
+                            <input type="radio" name="view_point_temp" value="in_group" class="h-4 w-4 text-[#00C9A7]">
+                            In Group
+                        </label>
+                        <label class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 hover:border-[#00C9A7]">
+                            <input type="radio" name="view_point_temp" value="out_group" class="h-4 w-4 text-[#00C9A7]">
+                            Out Group
+                        </label>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-2">Comments on View Point:</label>
+                        <textarea name="vp_comments_temp" placeholder="Optional: notes about viewpoint..." class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15"></textarea>
+                    </div>
                 </div>
             </fieldset>
             <fieldset class="space-y-3">
                 <legend class="text-sm font-semibold text-slate-700">Narrative Roles</legend>
                 ${rolesHtml}
+                <div class="mt-3">
+                    <label class="block text-xs font-semibold text-slate-600 mb-2">Comments on Narrative Roles:</label>
+                    <textarea name="nr_comments_temp" placeholder="Optional: notes about narrative roles..." class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15"></textarea>
+                </div>
             </fieldset>
-            ${unclearHtml}
-            <div>
-                <label class="block text-sm font-semibold text-slate-700">Comments</label>
-                <textarea name="comments" placeholder="Optional: add notes about nuances..." class="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15"></textarea>
+            <div class="flex items-center gap-3">
+                <label class="inline-flex items-center gap-2 text-sm text-slate-700">
+                    <input type="checkbox" name="unclear_case_temp" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]">
+                    Flag unclear case
+                </label>
             </div>
         </div>
     `;

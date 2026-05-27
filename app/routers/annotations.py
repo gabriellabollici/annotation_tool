@@ -148,7 +148,7 @@ async def save_annotation(
         # Determine annotation count from ANY field that is part of an annotation set
         annotation_indices = set()
         for key in form.keys():
-            if any(key.startswith(prefix) for prefix in ["view_point_", "social_identity_", "narrative_roles_", "other_label_", "unclear_case_"]):
+            if any(key.startswith(prefix) for prefix in ["view_point_", "social_identity_", "narrative_roles_", "other_label_", "unclear_case_", "si_comments_", "vp_comments_", "nr_comments_"]):
                 try:
                     index = key.split("_")[-1]
                     if index.isdigit():
@@ -156,19 +156,11 @@ async def save_annotation(
                 except (ValueError, IndexError):
                     continue
         
-        annotation_count = max(annotation_indices) + 1 if annotation_indices else 0
-        
-        # Fallback: check comments if no indexed fields found
-        if annotation_count == 0:
-            comments_list = form.getlist("comments")
-            annotation_count = len(comments_list) if comments_list else 1
-        else:
-            comments_list = form.getlist("comments")
+        annotation_count = max(annotation_indices) + 1 if annotation_indices else 1
         
         # Create new annotations from form data
-        # Use range(annotation_count) but skip indices that don't have any data if count was high
         for i in range(annotation_count):
-            if i not in annotation_indices and i >= len(comments_list):
+            if i not in annotation_indices and annotation_count > 1:
                 continue
 
             # Get all selected social identity checkboxes for this annotation
@@ -182,6 +174,11 @@ async def save_annotation(
             all_identities = selected_identities + ([other_label] if other_label else [])
             social_identity = ", ".join(all_identities) if all_identities else ""
             
+            # New specific comments
+            si_comment = form.get(f"si_comments_{i}", "").strip()
+            vp_comment = form.get(f"vp_comments_{i}", "").strip()
+            nr_comment = form.get(f"nr_comments_{i}", "").strip()
+            
             # Each viewpoint has indexed name: view_point_0, view_point_1, etc.
             view_point = form.get(f"view_point_{i}", "")
             
@@ -189,19 +186,18 @@ async def save_annotation(
             narrative_roles_key = f"narrative_roles_{i}"
             narrative_roles = form.getlist(narrative_roles_key)
             
-            # Pull comment for this annotation (if provided)
-            comment = comments_list[i].strip() if i < len(comments_list) else ""
-
             # Flag unclear case if selected
             unclear_case = form.get(f"unclear_case_{i}") in ("on", "1", "true", "True")
 
-            # Create annotation even if social_identity is empty (roles might be set)
+            # Create annotation
             annotation = Annotation(
                 image_id=image_id,
                 social_identity=social_identity,
+                social_identity_comments=si_comment,
                 view_point=view_point,
+                view_point_comments=vp_comment,
                 narrative_roles=json.dumps(narrative_roles),
-                comments=comment,
+                narrative_roles_comments=nr_comment,
                 unclear_case=unclear_case,
                 completed_at=datetime.utcnow(),
                 annotated_by=username,
