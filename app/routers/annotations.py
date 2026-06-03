@@ -156,6 +156,7 @@ async def save_annotation(
                 except (ValueError, IndexError):
                     continue
         
+        general_comments = form.get("general_comments", "").strip()
         annotation_count = max(annotation_indices) + 1 if annotation_indices else 1
         
         # Create new annotations from form data
@@ -198,6 +199,7 @@ async def save_annotation(
                 view_point_comments=vp_comment,
                 narrative_roles=json.dumps(narrative_roles),
                 narrative_roles_comments=nr_comment,
+                comments=general_comments,
                 unclear_case=unclear_case,
                 completed_at=datetime.utcnow(),
                 annotated_by=username,

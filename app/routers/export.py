@@ -105,7 +105,8 @@ async def export_project(
                 "comments": {
                     "social_identity": annotation.social_identity_comments,
                     "view_point": annotation.view_point_comments,
-                    "narrative_roles": annotation.narrative_roles_comments
+                    "narrative_roles": annotation.narrative_roles_comments,
+                    "general": annotation.comments
                 },
                 "unclear_case": bool(annotation.unclear_case),
                 "annotator_name": annotation.annotated_by,

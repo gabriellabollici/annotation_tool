@@ -48,6 +48,10 @@ def _ensure_new_comment_columns(sync_conn):
             sync_conn.execute(
                 text("ALTER TABLE annotations ADD COLUMN narrative_roles_comments TEXT NOT NULL DEFAULT ''")
             )
+        if "comments" not in columns:
+            sync_conn.execute(
+                text("ALTER TABLE annotations ADD COLUMN comments TEXT NOT NULL DEFAULT ''")
+            )
 
 
 def _remove_unique_constraint(sync_conn):
