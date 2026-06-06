@@ -291,12 +291,6 @@ function renumberAnnotations(event) {
             }
         });
         
-        // Text inputs
-        item.querySelectorAll('input[type="text"]').forEach(input => {
-            const name = input.getAttribute('name');
-            if (name && name.startsWith('other_label_')) input.setAttribute('name', `other_label_${index}`);
-        });
-
         // Radios
         item.querySelectorAll('input[type="radio"]').forEach(radio => {
             const name = radio.getAttribute('name');
@@ -306,11 +300,7 @@ function renumberAnnotations(event) {
         // Textareas
         item.querySelectorAll('textarea').forEach(textarea => {
             const name = textarea.getAttribute('name');
-            if (name) {
-                if (name.startsWith('si_comments_')) textarea.setAttribute('name', `si_comments_${index}`);
-                else if (name.startsWith('vp_comments_')) textarea.setAttribute('name', `vp_comments_${index}`);
-                else if (name.startsWith('nr_comments_')) textarea.setAttribute('name', `nr_comments_${index}`);
-            }
+            if (name && name.startsWith('nr_comments_')) textarea.setAttribute('name', `nr_comments_${index}`);
         });
         
         item.querySelector('h3').textContent = `Annotation ${index + 1}`;
@@ -328,8 +318,8 @@ function addAnnotation() {
     let socialIdentityHtml = '<div class="grid grid-cols-2 gap-x-4 gap-y-2">';
     socialIdentityOptions.forEach(option => {
         let labelText = option.charAt(0).toUpperCase() + option.slice(1);
-        if (option === \'LGTBQ+ rights supporter\') labelText = \'LGTBQ+ rights supporter\';
-        else if (option === \'anti-LGTBQ+\') labelText = \'Anti-LGTBQ+\';
+        if (option === 'LGTBQ+ rights supporter') labelText = 'LGTBQ+ rights supporter';
+        else if (option === 'anti-LGTBQ+') labelText = 'Anti-LGTBQ+';
         socialIdentityHtml += `<label class="flex items-center gap-2 text-xs text-slate-700"><input type="checkbox" name="social_identity_temp" value="${option}" class="h-4 w-4 flex-shrink-0 rounded border-slate-300 text-[#00C9A7]">${labelText}</label>`;
     });
     socialIdentityHtml += '</div>';
@@ -345,13 +335,13 @@ function addAnnotation() {
         });
         return content + '</div></div>';
     }
-    const positiveSuperior = [\'hero\', \'sage\', \'charmer\', \'winner\'];
-    const negativeInferior = [\'villain\', \'fool\', \'monster\', \'loser\'];
-    const positiveInferior = [\'victim\'];
+    const positiveSuperior = ['hero', 'sage', 'charmer', 'winner'];
+    const negativeInferior = ['villain', 'fool', 'monster', 'loser'];
+    const positiveInferior = ['victim'];
     
-    rolesHtml += roleColumn(\'Positive / Superior\', positiveSuperior);
-    rolesHtml += roleColumn(\'Negative / Inferior\', negativeInferior);
-    rolesHtml += roleColumn(\'Positive / Inferior\', positiveInferior);
+    rolesHtml += roleColumn('Positive / Superior', positiveSuperior);
+    rolesHtml += roleColumn('Negative / Inferior', negativeInferior);
+    rolesHtml += roleColumn('Positive / Inferior', positiveInferior);
     rolesHtml += '</div>';
     
     newAnnotation.innerHTML = `
