@@ -262,7 +262,7 @@
                 </div>
 
                 <div class="flex flex-wrap gap-3">
-                    <button type="button" class="inline-flex items-center justify-center rounded-full border border-[#00C9A7] px-5 py-3 text-sm font-semibold text-[#00C9A7] transition hover:bg-[#00C9A7] hover:text-white" onclick="addAnnotation()">+ Add Annotation</button>
+                    <button type="button" id="add-annotation-btn" class="inline-flex items-center justify-center rounded-full border border-[#00C9A7] px-5 py-3 text-sm font-semibold text-[#00C9A7] transition hover:bg-[#00C9A7] hover:text-white" onclick="addAnnotation()">+ Add Annotation</button>
                     <button type="submit" class="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#00C9A7] to-[#845EF7] px-5 py-3 text-sm font-semibold text-white shadow-sm">Save Annotations</button>
                 </div>
             </form>
@@ -293,6 +293,23 @@ const socialIdentityOptions = [
     'libertarian', 'politically disillusioned'
 ];
 
+let numIdentitiesLimit = {{ image.num_identities or 0 }};
+
+function checkLimit() {
+    const container = document.getElementById('annotations-container');
+    const items = container.querySelectorAll('.annotation-item');
+    const btn = document.getElementById('add-annotation-btn');
+    
+    if (numIdentitiesLimit > 0 && items.length >= numIdentitiesLimit) {
+        btn.style.display = 'none';
+    } else {
+        btn.style.display = 'inline-flex';
+    }
+}
+
+// Initial check
+document.addEventListener('DOMContentLoaded', checkLimit);
+
 function renumberAnnotations(event) {
     const container = document.getElementById('annotations-container');
     const items = container.querySelectorAll('.annotation-item');
@@ -322,6 +339,7 @@ function renumberAnnotations(event) {
         
         item.querySelector('h3').textContent = `Annotation ${index + 1}`;
     });
+    checkLimit();
     return true;
 }
 
@@ -403,6 +421,7 @@ function addAnnotation() {
         </div>
     `;
     container.appendChild(newAnnotation);
+    checkLimit();
 }
 
 function deleteAnnotationSet(btn) {
@@ -414,6 +433,7 @@ function deleteAnnotationSet(btn) {
     }
     const annotationItem = btn.closest('.annotation-item');
     annotationItem.remove();
+    checkLimit();
 }
 </script>
 {% endblock %}
