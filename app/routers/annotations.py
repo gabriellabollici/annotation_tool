@@ -186,6 +186,7 @@ async def save_annotation(
                     continue
         
         general_comments = form.get("general_comments", "").strip()
+        unclear_case = form.get("flag_unclear") in ("on", "1", "true", "True")
         annotation_count = max(annotation_indices) + 1 if annotation_indices else 1
         
         # Create new annotations from form data
@@ -216,9 +217,6 @@ async def save_annotation(
             narrative_roles_key = f"narrative_roles_{i}"
             narrative_roles = form.getlist(narrative_roles_key)
             
-            # Flag unclear case if selected
-            unclear_case = form.get(f"unclear_case_{i}") in ("on", "1", "true", "True")
-
             # Create annotation
             annotation = Annotation(
                 image_id=image_id,

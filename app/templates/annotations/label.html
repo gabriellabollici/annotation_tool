@@ -156,12 +156,6 @@
                                         <textarea name="nr_comments_{{ ann_index }}" placeholder="Optional: notes about narrative roles..." class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15">{% if ann.narrative_roles_comments %}{{ ann.narrative_roles_comments }}{% endif %}</textarea>
                                     </div>
                                 </fieldset>
-                                <div class="flex items-center gap-3">
-                                    <label class="inline-flex items-center gap-2 text-sm text-slate-700">
-                                        <input type="checkbox" name="unclear_case_{{ ann_index }}" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]" {% if ann.unclear_case %}checked{% endif %}>
-                                        Flag unclear case
-                                    </label>
-                                </div>
                             </div>
                         </div>
                         {% endfor %}
@@ -245,20 +239,23 @@
                                         <textarea name="nr_comments_0" placeholder="Optional: notes about narrative roles..." class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15"></textarea>
                                     </div>
                                 </fieldset>
-                                <div class="flex items-center gap-3">
-                                    <label class="inline-flex items-center gap-2 text-sm text-slate-700">
-                                        <input type="checkbox" name="unclear_case_0" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]">
-                                        Flag unclear case
-                                    </label>
-                                </div>
                             </div>
                         </div>
                     {% endif %}
                 </div>
                 
-                <div class="rounded-[1.25rem] border border-slate-200 bg-slate-50 p-5">
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">General Comments</label>
-                    <textarea name="general_comments" placeholder="Optional: any overall comments about this image..." class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15">{% if user_annotations %}{{ user_annotations[0].comments }}{% endif %}</textarea>
+                <div class="rounded-[1.25rem] border border-slate-200 bg-slate-50 p-5 space-y-4">
+                    <div class="flex items-center gap-3">
+                        <label class="inline-flex items-center gap-2 text-sm font-semibold text-slate-700">
+                            <input type="checkbox" name="flag_unclear" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]" 
+                                   {% if user_annotations and user_annotations|selectattr('unclear_case')|list|length > 0 %}checked{% endif %}>
+                            Flag unclear case for this image
+                        </label>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">General Comments</label>
+                        <textarea name="general_comments" placeholder="Optional: any overall comments about this image..." class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15">{% if user_annotations %}{{ user_annotations[0].comments }}{% endif %}</textarea>
+                    </div>
                 </div>
 
                 <div class="flex flex-wrap gap-3">
@@ -321,7 +318,6 @@ function renumberAnnotations(event) {
             if (name) {
                 if (name.startsWith('narrative_roles_')) checkbox.setAttribute('name', `narrative_roles_${index}`);
                 else if (name.startsWith('social_identity_')) checkbox.setAttribute('name', `social_identity_${index}`);
-                else if (name.startsWith('unclear_case_')) checkbox.setAttribute('name', `unclear_case_${index}`);
             }
         });
         
@@ -412,12 +408,6 @@ function addAnnotation() {
                     <textarea name="nr_comments_temp" placeholder="Optional: notes about narrative roles..." class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15"></textarea>
                 </div>
             </fieldset>
-            <div class="flex items-center gap-3">
-                <label class="inline-flex items-center gap-2 text-sm text-slate-700">
-                    <input type="checkbox" name="unclear_case_temp" class="h-4 w-4 rounded border-slate-300 text-[#00C9A7]">
-                    Flag unclear case
-                </label>
-            </div>
         </div>
     `;
     container.appendChild(newAnnotation);
