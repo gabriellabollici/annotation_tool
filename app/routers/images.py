@@ -63,14 +63,9 @@ async def list_images(
             if ann.annotated_by == username:
                 user_annotation = ann
                 break
-        
-        # Get unique annotator names
-        unique_annotators = sorted(list(set(ann.annotated_by for ann in image.annotations)))
-        
         image_data.append({
             "image": image,
             "user_annotation": user_annotation,
-            "unique_annotators": unique_annotators,
             "all_annotations": image.annotations if is_admin == "1" else [],
         })
 

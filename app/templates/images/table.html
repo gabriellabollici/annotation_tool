@@ -80,9 +80,9 @@
                     </td>
                     {% if is_admin %}
                     <td class="px-6 py-4 text-sm text-slate-600">
-                        {% if item.unique_annotators %}
-                            {% for name in item.unique_annotators %}
-                                <span class="mr-1">{{ name }}{% if not loop.last %},{% endif %}</span>
+                        {% if item.all_annotations %}
+                            {% for ann in item.all_annotations %}
+                                <span class="mr-1">{{ ann.annotated_by }}{% if not loop.last %},{% endif %}</span>
                             {% endfor %}
                         {% else %}
                             <span class="text-slate-400">—</span>
