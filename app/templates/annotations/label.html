@@ -32,7 +32,8 @@
                            class="w-20 rounded-xl border border-slate-200 px-3 py-1 text-sm focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15"
                            hx-post="/images/{{ image.id }}/num-identities" 
                            hx-trigger="change, keyup delay:500ms"
-                           hx-swap="none">
+                           hx-swap="none"
+                           oninput="numIdentitiesLimit = parseInt(this.value) || 0; checkLimit();">
                     {% else %}
                     <span class="text-sm font-bold text-[#00C9A7]">{{ image.num_identities or 0 }}</span>
                     {% endif %}

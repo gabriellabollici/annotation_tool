@@ -80,9 +80,9 @@
                     </td>
                     {% if is_admin %}
                     <td class="px-6 py-4 text-sm text-slate-600">
-                        {% if item.all_annotations %}
-                            {% for ann in item.all_annotations %}
-                                <span class="mr-1">{{ ann.annotated_by }}{% if not loop.last %},{% endif %}</span>
+                        {% if item.unique_annotators %}
+                            {% for name in item.unique_annotators %}
+                                <span class="mr-1">{{ name }}{% if not loop.last %},{% endif %}</span>
                             {% endfor %}
                         {% else %}
                             <span class="text-slate-400">—</span>
@@ -93,7 +93,7 @@
                         <div class="flex flex-wrap gap-3">
                             <a href="/images/{{ item.image.id }}/annotate" class="inline-flex min-w-[110px] items-center justify-center rounded-full border border-[#00C9A7] px-4 py-2 text-sm font-semibold text-[#00C9A7] transition hover:bg-[#00C9A7] hover:text-white">Annotate</a>
                             {% if item.user_annotation %}
-                            <form method="post" action="/annotations/{{ item.user_annotation.id }}/delete" class="inline-flex" onsubmit="return confirm('Delete your annotation?')">
+                            <form method="post" action="/annotations/delete-all/{{ item.image.id }}" class="inline-flex" onsubmit="return confirm('Delete your annotations for this image?')">
                                 <button type="submit" class="inline-flex min-w-[110px] items-center justify-center rounded-full border border-[#845EF7] px-4 py-2 text-sm font-semibold text-[#845EF7] transition hover:bg-[#845EF7] hover:text-white">🗑 My Ann.</button>
                             </form>
                             {% endif %}

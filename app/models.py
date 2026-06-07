@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -14,7 +14,7 @@ class Project(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(255))
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     images: Mapped[list["Image"]] = relationship(back_populates="project", cascade="all, delete-orphan")
 
@@ -26,7 +26,7 @@ class Image(Base):
     project_id: Mapped[int] = mapped_column(ForeignKey("projects.id"))
     filename: Mapped[str] = mapped_column(String(512))
     num_identities: Mapped[int] = mapped_column(Integer, default=0, nullable=True)
-    imported_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    imported_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     project: Mapped["Project"] = relationship(back_populates="images")
     annotations: Mapped[list["Annotation"]] = relationship(back_populates="image", cascade="all, delete-orphan")
@@ -45,7 +45,7 @@ class Annotation(Base):
     narrative_roles_comments: Mapped[str] = mapped_column(Text, default="")
     comments: Mapped[str] = mapped_column(Text, default="")
     unclear_case: Mapped[bool] = mapped_column(Boolean, default=False)
-    completed_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    completed_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
     annotated_by: Mapped[str] = mapped_column(String(255), default="user_unknown")
 
     image: Mapped["Image"] = relationship(back_populates="annotations")

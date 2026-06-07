@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -177,7 +177,7 @@ async def save_annotation(
         # Determine annotation count from ANY field that is part of an annotation set
         annotation_indices = set()
         for key in form.keys():
-            if any(key.startswith(prefix) for prefix in ["view_point_", "social_identity_", "narrative_roles_", "other_label_", "unclear_case_", "si_comments_", "vp_comments_", "nr_comments_"]):
+            if any(key.startswith(prefix) for prefix in ["view_point_", "social_identity_", "narrative_roles_", "nr_comments_"]):
                 try:
                     index = key.split("_")[-1]
                     if index.isdigit():
@@ -197,17 +197,9 @@ async def save_annotation(
             # Get all selected social identity checkboxes for this annotation
             social_identity_key = f"social_identity_{i}"
             selected_identities = form.getlist(social_identity_key)
+            social_identity = ", ".join(selected_identities) if selected_identities else ""
             
-            # Get the "other label" field for this annotation
-            other_label = form.get(f"other_label_{i}", "").strip()
-            
-            # Combine selected identities with other label
-            all_identities = selected_identities + ([other_label] if other_label else [])
-            social_identity = ", ".join(all_identities) if all_identities else ""
-            
-            # New specific comments
-            si_comment = form.get(f"si_comments_{i}", "").strip()
-            vp_comment = form.get(f"vp_comments_{i}", "").strip()
+            # Narrative Role comments
             nr_comment = form.get(f"nr_comments_{i}", "").strip()
             
             # Each viewpoint has indexed name: view_point_0, view_point_1, etc.
@@ -221,14 +213,12 @@ async def save_annotation(
             annotation = Annotation(
                 image_id=image_id,
                 social_identity=social_identity,
-                social_identity_comments=si_comment,
                 view_point=view_point,
-                view_point_comments=vp_comment,
                 narrative_roles=json.dumps(narrative_roles),
                 narrative_roles_comments=nr_comment,
                 comments=general_comments,
                 unclear_case=unclear_case,
-                completed_at=datetime.utcnow(),
+                completed_at=datetime.now(timezone.utc),
                 annotated_by=username,
             )
             db.add(annotation)
@@ -255,6 +245,36 @@ async def save_annotation(
             return RedirectResponse(url=f"/projects/{image.project_id}/images", status_code=302)
         else:
             return RedirectResponse(url="/projects", status_code=302)
+
+
+@router.post("/annotations/delete-all/{image_id}")
+async def delete_all_user_annotations(
+    image_id: str,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+):
+    username = request.session.get("username", "")
+    if not username:
+        return RedirectResponse(url="/login", status_code=302)
+
+    # Get all annotations by THIS user for THIS image
+    result = await db.execute(
+        select(Annotation).where(Annotation.image_id == image_id, Annotation.annotated_by == username)
+    )
+    annotations = result.scalars().all()
+    
+    if not annotations:
+        return RedirectResponse(url="/projects", status_code=302)
+
+    image_result = await db.execute(select(Image).where(Image.id == image_id))
+    image = image_result.scalar_one_or_none()
+    project_id = image.project_id if image else 1
+
+    for ann in annotations:
+        await db.delete(ann)
+    
+    await db.commit()
+    return RedirectResponse(url=f"/projects/{project_id}/images", status_code=302)
 
 
 @router.post("/annotations/{annotation_id}/delete")
