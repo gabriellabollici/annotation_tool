@@ -24,6 +24,23 @@
 
     <div class="grid gap-6 xl:grid-cols-[1.25fr_0.95fr]">
         <div class="rounded-[1.75rem] bg-white/90 p-6 shadow-sm ring-1 ring-slate-200">
+            <div class="mb-4 space-y-3">
+                <div class="flex items-center gap-3">
+                    <span class="text-sm font-semibold text-slate-700">Number of identities:</span>
+                    {% if is_admin %}
+                    <input type="number" name="num_identities" value="{{ image.num_identities or 0 }}" 
+                           class="w-20 rounded-xl border border-slate-200 px-3 py-1 text-sm focus:border-[#00C9A7] focus:ring-4 focus:ring-[#00C9A7]/15"
+                           hx-post="/images/{{ image.id }}/num-identities" 
+                           hx-trigger="change, keyup delay:500ms"
+                           hx-swap="none">
+                    {% else %}
+                    <span class="text-sm font-bold text-[#00C9A7]">{{ image.num_identities or 0 }}</span>
+                    {% endif %}
+                </div>
+                <p class="text-xs leading-relaxed text-slate-500 italic">
+                    <span class="font-bold text-[#845EF7]">REMINDER:</span> only label those identities that have an evaluative dimension. Consider if "I" am saying something good/bad about "me" (my ingroup identity) or something good/bad is being said about "them" (the outgroup identity).
+                </p>
+            </div>
             <img src="/static/uploads/{{ project.id }}/{{ image.filename }}" alt="{{ image.filename }}" class="w-full rounded-[1.5rem] border border-slate-200 object-cover">
         </div>
         <div class="rounded-[1.75rem] bg-white/90 p-6 shadow-sm ring-1 ring-slate-200">

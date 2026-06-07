@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, String, Text
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -25,6 +25,7 @@ class Image(Base):
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     project_id: Mapped[int] = mapped_column(ForeignKey("projects.id"))
     filename: Mapped[str] = mapped_column(String(512))
+    num_identities: Mapped[int] = mapped_column(Integer, default=0, nullable=True)
     imported_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     project: Mapped["Project"] = relationship(back_populates="images")

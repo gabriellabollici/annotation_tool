@@ -73,6 +73,16 @@ def _remove_unique_constraint(sync_conn):
             pass
 
 
+def _ensure_image_columns(sync_conn):
+    inspector = inspect(sync_conn)
+    if "images" in inspector.get_table_names():
+        columns = [col["name"] for col in inspector.get_columns("images")]
+        if "num_identities" not in columns:
+            sync_conn.execute(
+                text("ALTER TABLE images ADD COLUMN num_identities INTEGER DEFAULT 0")
+            )
+
+
 async def init_db():
     DATABASE_DIR.mkdir(parents=True, exist_ok=True)
     async with engine.begin() as conn:
@@ -80,6 +90,7 @@ async def init_db():
         await conn.run_sync(_ensure_password_column)
         await conn.run_sync(_ensure_unclear_case_column)
         await conn.run_sync(_ensure_new_comment_columns)
+        await conn.run_sync(_ensure_image_columns)
         await conn.run_sync(_remove_unique_constraint)
 
 

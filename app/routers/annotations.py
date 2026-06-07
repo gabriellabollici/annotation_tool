@@ -29,9 +29,9 @@ async def annotate_all(
     db: AsyncSession = Depends(get_db),
 ):
     username = request.session.get("username", "")
-    is_admin = request.session.get("is_admin", "0")
-    if not username or is_admin == "1":
-        return RedirectResponse(url="/projects", status_code=302)
+    is_admin_session = request.session.get("is_admin", "0")
+    if not username:
+        return RedirectResponse(url="/login", status_code=302)
 
     result = await db.execute(
         select(Image)
@@ -66,6 +66,7 @@ async def annotate_all(
             "user_annotations": user_annotations,
             "narrative_roles_options": NARRATIVE_ROLES_OPTIONS,
             "username": username,
+            "is_admin": is_admin_session == "1",
             "annotate_all_mode": True,
             "current_index": index,
             "total_images": len(images),
@@ -82,6 +83,7 @@ async def annotate_form(
     db: AsyncSession = Depends(get_db),
 ):
     username = request.session.get("username", "")
+    is_admin_session = request.session.get("is_admin", "0")
     if not username:
         return RedirectResponse(url="/login", status_code=302)
 
@@ -111,8 +113,35 @@ async def annotate_form(
             "user_annotations": user_annotations,
             "narrative_roles_options": NARRATIVE_ROLES_OPTIONS,
             "username": username,
+            "is_admin": is_admin_session == "1",
         },
     )
+
+
+@router.post("/images/{image_id}/num-identities")
+async def update_num_identities(
+    request: Request,
+    image_id: str,
+    db: AsyncSession = Depends(get_db),
+):
+    is_admin = request.session.get("is_admin", "0")
+    if is_admin != "1":
+        return HTMLResponse(content="Unauthorized", status_code=403)
+    
+    form = await request.form()
+    num = form.get("num_identities", "0")
+    try:
+        num = int(num)
+    except ValueError:
+        num = 0
+    
+    result = await db.execute(select(Image).where(Image.id == image_id))
+    image = result.scalar_one_or_none()
+    if image:
+        image.num_identities = num
+        await db.commit()
+    
+    return HTMLResponse(content=str(num))
 
 
 @router.post("/images/{image_id}/annotate")
