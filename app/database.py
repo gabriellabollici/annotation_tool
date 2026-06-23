@@ -36,14 +36,6 @@ def _ensure_new_comment_columns(sync_conn):
     inspector = inspect(sync_conn)
     if "annotations" in inspector.get_table_names():
         columns = [col["name"] for col in inspector.get_columns("annotations")]
-        if "social_identity_comments" not in columns:
-            sync_conn.execute(
-                text("ALTER TABLE annotations ADD COLUMN social_identity_comments TEXT NOT NULL DEFAULT ''")
-            )
-        if "view_point_comments" not in columns:
-            sync_conn.execute(
-                text("ALTER TABLE annotations ADD COLUMN view_point_comments TEXT NOT NULL DEFAULT ''")
-            )
         if "narrative_roles_comments" not in columns:
             sync_conn.execute(
                 text("ALTER TABLE annotations ADD COLUMN narrative_roles_comments TEXT NOT NULL DEFAULT ''")

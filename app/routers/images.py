@@ -113,19 +113,22 @@ async def import_images(
     for file in files:
         if not file.filename:
             continue
-        ext = Path(file.filename).suffix.lower()
+        
+        # Use only the basename to prevent path traversal
+        filename = Path(file.filename).name
+        ext = Path(filename).suffix.lower()
         if ext not in ALLOWED_EXTENSIONS:
             continue
-        if file.filename in existing_filenames:
+        if filename in existing_filenames:
             continue
 
         # Save file to uploads
-        dest = project_upload_dir / file.filename
+        dest = project_upload_dir / filename
         contents = await file.read()
         dest.write_bytes(contents)
 
         # Create DB record
-        image = Image(project_id=project_id, filename=file.filename)
+        image = Image(project_id=project_id, filename=filename)
         db.add(image)
         existing_filenames.add(file.filename)
 

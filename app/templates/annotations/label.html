@@ -71,7 +71,9 @@
                         'green party supporter', 'climate activist', 
                         'climate change skeptic/denier', 'climate disengaged',
                         'misogynist/male supremacist', 'sex-worker', 
-                        'libertarian', 'politically disillusioned'
+                        'libertarian', 'politically disillusioned',
+                        'conspiracy theorist', 'plant based/vegan',
+                        'clean energy advocate', 'nuclear energy advocate'
                     ] %}
                     {% if user_annotations %}
                         {% for ann in user_annotations %}
@@ -288,7 +290,9 @@ const socialIdentityOptions = [
     'green party supporter', 'climate activist', 
     'climate change skeptic/denier', 'climate disengaged',
     'misogynist/male supremacist', 'sex-worker', 
-    'libertarian', 'politically disillusioned'
+    'libertarian', 'politically disillusioned',
+    'conspiracy theorist', 'plant based/vegan',
+    'clean energy advocate', 'nuclear energy advocate'
 ];
 
 let numIdentitiesLimit = {{ image.num_identities or 0 }};
